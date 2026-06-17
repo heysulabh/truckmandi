@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Truck Mandi – India's Trusted Commercial Vehicle Marketplace</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
   :root {
     /* ── Brand core (kept for recognition) ── */
@@ -42,7 +42,7 @@
     overflow-x: hidden;
   }
 
-  .disp { font-family: 'Yatra One', 'Noto Sans Devanagari', cursive; font-weight: 400; }
+  .disp { font-family: 'Rajdhani', 'Noto Sans Devanagari', sans-serif; font-weight: 700; }
 
   a:focus-visible, button:focus-visible { outline: 3px solid var(--marigold); outline-offset: 2px; }
 
@@ -58,14 +58,12 @@
   }
   .logo-wrap { display: flex; align-items: center; gap: 10px; }
   .logo-icon {
-    width: 42px; height: 42px;
-    background: var(--orange);
-    border-radius: 8px;
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 22px;
   }
+  .logo-icon img { width: 100%; height: 100%; object-fit: contain; }
   .logo-text { line-height: 1; }
-  .logo-text .brand { font-family: 'Yatra One', cursive; font-size: 22px; color: var(--cream); letter-spacing: 0.5px; }
+  .logo-text .brand { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 21px; color: var(--cream); letter-spacing: 1px; }
   .logo-text .brand span { color: var(--orange); }
   .logo-text .sub { font-size: 9px; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; }
   .nav-call {
@@ -86,22 +84,27 @@
     background: linear-gradient(180deg, #1A1009 0%, #2B1408 38%, #5A2410 62%, #8E3A12 78%, #160F0B 100%);
   }
 
-  .hero-sun {
-    position: absolute; left: 50%; top: 32%;
-    width: 220px; height: 220px;
-    background: radial-gradient(circle, var(--marigold) 0%, var(--orange) 55%, rgba(255,107,0,0) 75%);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0.55;
-    animation: sunPulse 6s ease-in-out infinite;
-    z-index: 0;
+  .vehicle-parade {
+    position: relative; z-index: 2;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+    padding: 18px 16px 0;
   }
-  @keyframes sunPulse { 0%,100% { opacity: 0.45; } 50% { opacity: 0.65; } }
-
-  .hero-hills {
-    position: absolute; bottom: 110px; left: 0; right: 0; height: 160px; z-index: 0;
+  .vehicle-chip {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    background: rgba(0,0,0,0.32);
+    border: 1px solid rgba(255,182,39,0.35);
+    border-radius: 12px;
+    padding: 10px 14px;
+    min-width: 68px;
+    animation: floatChip 3.2s ease-in-out infinite;
   }
-  .hero-hills svg { width: 100%; height: 100%; display: block; }
+  .vehicle-chip .v-icon { font-size: 26px; line-height: 1; }
+  .vehicle-chip .v-label { font-size: 11px; font-weight: 700; color: var(--cream); text-transform: uppercase; letter-spacing: 0.4px; }
+  .vehicle-chip:nth-child(2) { animation-delay: 0.4s; }
+  .vehicle-chip:nth-child(3) { animation-delay: 0.8s; }
+  .vehicle-chip:nth-child(4) { animation-delay: 1.2s; }
+  .vehicle-chip:nth-child(5) { animation-delay: 1.6s; }
+  @keyframes floatChip { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
   .hero-content {
     position: relative; z-index: 2;
@@ -123,9 +126,11 @@
   }
 
   .hero h1 {
-    font-family: 'Yatra One', 'Noto Sans Devanagari', cursive;
-    font-size: clamp(40px, 7.2vw, 68px);
-    line-height: 1.08;
+    font-family: 'Rajdhani', 'Noto Sans Devanagari', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(38px, 7vw, 64px);
+    line-height: 1.12;
     letter-spacing: 0.5px;
     margin-bottom: 16px;
     text-shadow: 0 4px 24px rgba(0,0,0,0.4);
@@ -207,8 +212,10 @@
   /* ── SECTIONS SHARED ── */
   section { padding: 72px 20px; }
   .section-title {
-    font-family: 'Yatra One', 'Noto Sans Devanagari', cursive;
-    font-size: clamp(30px, 4.6vw, 46px);
+    font-family: 'Rajdhani', 'Noto Sans Devanagari', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: clamp(28px, 4.4vw, 42px);
     letter-spacing: 0.5px;
     text-align: center;
     margin-bottom: 10px;
@@ -234,7 +241,7 @@
     font-family: 'Bebas Neue', sans-serif; font-size: 56px;
     padding: 10px 24px; border-radius: 12px; line-height: 1; margin-bottom: 16px; letter-spacing: 2px;
   }
-  .verify-left h3 { font-family: 'Yatra One', cursive; font-size: 24px; margin-bottom: 8px; }
+  .verify-left h3 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 23px; margin-bottom: 8px; }
   .verify-left p { color: var(--gray); font-size: 15px; line-height: 1.6; }
   .verify-left .same-price { color: var(--marigold); font-weight: 700; }
   .verify-right { flex: 1; min-width: 220px; }
@@ -276,9 +283,23 @@
     display: flex; align-items: center; justify-content: center; font-size: 24px; transition: background 0.3s;
   }
   .service-card:hover .service-icon { background: rgba(255,182,39,0.22); }
-  .service-card h3 { font-family: 'Yatra One', cursive; font-size: 20px; }
+  .service-card h3 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 19px; }
   .service-card p { color: var(--gray); font-size: 14px; line-height: 1.5; }
   .service-arrow { margin-top: auto; color: var(--orange); font-size: 20px; font-weight: 700; }
+
+  .mini-verify {
+    max-width: 720px; margin: 36px auto 0;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px;
+    background: rgba(255,107,0,0.1); border: 1px solid rgba(255,107,0,0.3);
+    border-radius: 12px; padding: 16px 22px; text-align: center;
+  }
+  .mini-verify span { font-size: 14px; font-weight: 600; color: #ECDFC8; }
+  .mini-verify a {
+    display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: #fff;
+    background: var(--orange); padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 700;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .mini-verify a:hover { background: var(--orange-dark); }
 
   /* ── DRIVER HUB ── */
   .driver-section { background: var(--ink); position: relative; }
@@ -295,7 +316,7 @@
   }
   .driver-card.hire .driver-tag { background: rgba(14,110,102,0.3); color: #5FE0D2; }
   .driver-card.job .driver-tag { background: rgba(255,182,39,0.25); color: var(--marigold); }
-  .driver-card h3 { font-family: 'Yatra One', cursive; font-size: 26px; margin-bottom: 10px; }
+  .driver-card h3 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 24px; margin-bottom: 10px; }
   .driver-card p { color: #D8CFBF; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
   .btn-driver {
     display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fff;
@@ -306,6 +327,27 @@
   .driver-card.job .btn-driver { background: var(--marigold); color: #1A1209; box-shadow: 0 4px 18px rgba(255,182,39,0.35); }
   .driver-card.job .btn-driver:hover { background: #E5A11C; transform: translateY(-2px); }
 
+  /* ── TYRE & SERVICE CENTRE ── */
+  .care-section { background: var(--ink2); }
+  .care-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; max-width: 880px; margin: 0 auto; }
+  .care-card { border-radius: var(--r-lg); padding: 36px 28px; position: relative; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
+  .care-card.tyre { background: linear-gradient(160deg, rgba(255,107,0,0.18), rgba(255,107,0,0.03)); border-color: rgba(255,107,0,0.4); }
+  .care-card.service { background: linear-gradient(160deg, rgba(14,110,102,0.2), rgba(14,110,102,0.04)); border-color: rgba(14,110,102,0.4); }
+  .care-tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 50px; margin-bottom: 16px; }
+  .care-card.tyre .care-tag { background: rgba(255,107,0,0.25); color: var(--orange-light); }
+  .care-card.service .care-tag { background: rgba(14,110,102,0.3); color: #5FE0D2; }
+  .care-card h3 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 23px; margin-bottom: 10px; }
+  .care-card p { color: #D8CFBF; font-size: 15px; line-height: 1.6; margin-bottom: 18px; }
+  .care-benefits { list-style: none; margin-bottom: 24px; }
+  .care-benefits li { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .care-benefits li:last-child { border-bottom: none; }
+  .care-benefits .icon { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; background: rgba(255,255,255,0.08); }
+  .btn-care { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #fff; padding: 14px 24px; border-radius: 8px; font-size: 16px; font-weight: 700; transition: all 0.2s; }
+  .care-card.tyre .btn-care { background: var(--orange); box-shadow: 0 4px 18px rgba(255,107,0,0.4); }
+  .care-card.tyre .btn-care:hover { background: var(--orange-dark); transform: translateY(-2px); }
+  .care-card.service .btn-care { background: var(--teal); box-shadow: 0 4px 18px rgba(14,110,102,0.4); }
+  .care-card.service .btn-care:hover { background: #0A5751; transform: translateY(-2px); }
+
   /* ── NEW VEHICLE BOOKING ── */
   .newveh-section { background: var(--ink2); }
   .newveh-card {
@@ -315,7 +357,7 @@
     padding: 44px 30px;
   }
   .newveh-card .service-icon { margin: 0 auto 18px; width: 60px; height: 60px; font-size: 28px; background: rgba(215,38,61,0.18); }
-  .newveh-card h3 { font-family: 'Yatra One', cursive; font-size: 28px; margin-bottom: 12px; }
+  .newveh-card h3 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 26px; margin-bottom: 12px; }
   .newveh-card p { color: var(--gray); font-size: 15px; max-width: 480px; margin: 0 auto 26px; line-height: 1.6; }
   .brand-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 28px; }
   .brand-chip { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 6px 14px; border-radius: 50px; font-size: 13px; font-weight: 600; color: #ECDFC8; }
@@ -338,7 +380,7 @@
   }
   .step-connector { position: absolute; top: 60px; left: calc(50% + 30px); right: calc(-50% + 30px); height: 2px; background: linear-gradient(90deg, var(--orange), rgba(255,107,0,0.2)); z-index: 0; }
   .step:last-child .step-connector { display: none; }
-  .step h4 { font-family: 'Yatra One', cursive; font-size: 19px; margin-bottom: 8px; }
+  .step h4 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 18px; margin-bottom: 8px; }
   .step p { color: var(--gray); font-size: 14px; }
 
   /* ── WHY ── */
@@ -347,27 +389,9 @@
   .why-card { background: var(--ink3); border-radius: 14px; padding: 26px 22px; border-left: 3px solid var(--orange); transition: transform 0.2s; }
   .why-card:hover { transform: translateY(-3px); }
   .why-icon { font-size: 34px; margin-bottom: 12px; }
-  .why-card h4 { font-family: 'Yatra One', cursive; font-size: 19px; margin-bottom: 6px; color: var(--orange-light); }
+  .why-card h4 { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 18px; margin-bottom: 6px; color: var(--orange-light); }
   .why-card p { color: var(--gray); font-size: 14px; line-height: 1.5; }
 
-  /* ── REGIONAL / STATES ── */
-  .region-section { background: var(--ink3); }
-  .region-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
-  .region-card {
-    background: var(--ink2); border-radius: 14px; padding: 0; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.06);
-  }
-  .region-bar { height: 8px; width: 100%; background: var(--rc, var(--orange)); }
-  .region-body { padding: 20px 18px; }
-  .region-status {
-    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
-    padding: 3px 9px; border-radius: 50px; margin-bottom: 10px;
-  }
-  .region-status.active { background: rgba(37,211,102,0.18); color: #5FE6A0; }
-  .region-status.soon { background: rgba(255,182,39,0.18); color: var(--marigold); }
-  .region-card h4 { font-family: 'Yatra One', cursive; font-size: 19px; margin-bottom: 4px; }
-  .region-card .art-tag { font-size: 12px; color: var(--gray); margin-bottom: 10px; font-weight: 600; }
-  .region-card .cities { font-size: 13px; color: #C9BFAD; line-height: 1.5; }
 
   /* ── TRUST / COMPANY ── */
   .trust-section { background: var(--ink2); }
@@ -378,7 +402,7 @@
     display: flex; flex-wrap: wrap; gap: 28px; align-items: center;
   }
   .trust-logo-block { flex: 0 0 auto; }
-  .trust-logo-block .big-logo { font-family: 'Yatra One', cursive; font-size: 32px; line-height: 1; }
+  .trust-logo-block .big-logo { font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase; font-size: 28px; line-height: 1; }
   .trust-logo-block .big-logo span { color: var(--orange); }
   .trust-logo-block .reg-tag { font-size: 11px; color: var(--gray); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 4px; }
   .trust-info { flex: 1; min-width: 220px; }
@@ -437,8 +461,9 @@
     .stat-item { min-width: 100px; }
     .step-connector { display: none; }
     .steps-wrap { gap: 8px; }
-    .hero-hills { display: none; }
-    .hero-sun { width: 150px; height: 150px; }
+    .vehicle-chip { padding: 8px 10px; min-width: 58px; }
+    .vehicle-chip .v-icon { font-size: 21px; }
+    .vehicle-chip .v-label { font-size: 9.5px; }
   }
 </style>
 </head>
@@ -447,7 +472,7 @@
 <!-- NAV -->
 <nav>
   <div class="logo-wrap">
-    <div class="logo-icon">🚛</div>
+    <div class="logo-icon"><img src="truckmandi-logo.png" alt="Truck Mandi Logo"/></div>
     <div class="logo-text">
       <div class="brand">Truck <span>Mandi</span></div>
       <div class="sub">Commercial Vehicle Marketplace</div>
@@ -458,11 +483,12 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-sun"></div>
-  <div class="hero-hills">
-    <svg viewBox="0 0 1200 160" preserveAspectRatio="none">
-      <path d="M0,160 L0,90 Q150,30 300,80 Q480,140 650,70 Q850,-10 1050,60 Q1150,95 1200,75 L1200,160 Z" fill="#100B07" opacity="0.85"/>
-    </svg>
+  <div class="vehicle-parade">
+    <div class="vehicle-chip"><span class="v-icon">🛻</span><span class="v-label">Pickup</span></div>
+    <div class="vehicle-chip"><span class="v-icon">🚚</span><span class="v-label">Mini Truck</span></div>
+    <div class="vehicle-chip"><span class="v-icon">🚛</span><span class="v-label">Trailer</span></div>
+    <div class="vehicle-chip"><span class="v-icon">🏗️</span><span class="v-label">JCB</span></div>
+    <div class="vehicle-chip"><span class="v-icon">🛞</span><span class="v-label">All Types</span></div>
   </div>
 
   <div class="hero-content">
@@ -604,18 +630,10 @@
         <p>Protect your commercial vehicle with the right insurance plan at right price.</p>
         <div class="service-arrow">→</div>
       </a>
-      <a href="https://wa.me/918226897842?text=Hi%20I%20need%20tyre%20booking%20for%20my%20commercial%20vehicle." class="service-card" target="_blank">
-        <div class="service-icon">🛞</div>
-        <h3>Tyre Booking</h3>
-        <p>Book branded tyres for your truck at dealer prices, delivered fast.</p>
-        <div class="service-arrow">→</div>
-      </a>
-      <a href="https://wa.me/918226897842?text=Hi%20I%20need%20an%20authorized%20service%20centre%20for%20my%20vehicle." class="service-card" target="_blank">
-        <div class="service-icon">🔧</div>
-        <h3>Service Centre</h3>
-        <p>Authorized brand service centres for repair &amp; maintenance, near you.</p>
-        <div class="service-arrow">→</div>
-      </a>
+    </div>
+    <div class="mini-verify">
+      <span>Buy ya Sell se pehle apna account verify zaroor karein</span>
+      <a href="https://wa.me/918226897842?text=Hi%20I%20want%20to%20complete%20%E2%82%B9499%20verification%20for%20Truck%20Mandi.%20Please%20guide%20payment%20process." target="_blank">✅ Verify Now – ₹499</a>
     </div>
   </div>
 </section>
@@ -646,6 +664,44 @@
   </div>
 </section>
 
+<!-- TYRE & SERVICE CENTRE -->
+<section class="care-section">
+  <div class="container">
+    <div class="section-title">Tyre &amp; <span>Service Centre</span></div>
+    <p class="section-sub">Gaadi ki dekh-bhaal, sahi jagah aur sahi daam mein</p>
+    <div class="care-grid">
+      <div class="care-card tyre">
+        <span class="care-tag">All India Service</span>
+        <h3>🛞 Tyre Booking</h3>
+        <p>MRF, Apollo, CEAT, JK Tyre jaise top brands ki tyre booking — seedha WhatsApp par, all over India.</p>
+        <ul class="care-benefits">
+          <li><span class="icon">🇮🇳</span> All India Service Available</li>
+          <li><span class="icon">💸</span> Extra Discount &amp; Cashback</li>
+          <li><span class="icon">🏷️</span> Top Branded Tyres</li>
+          <li><span class="icon">⚡</span> Fast Fitting Support</li>
+        </ul>
+        <a href="https://wa.me/918226897842?text=Hi%2C%20mujhe%20tyre%20booking%20karni%20hai.%20Vehicle%20model%20aur%20tyre%20size%3A%20" class="btn-care" target="_blank">
+          🟢 Tyre Book Karein
+        </a>
+      </div>
+      <div class="care-card service">
+        <span class="care-tag">Authorized Centres</span>
+        <h3>🔧 Service Centre</h3>
+        <p>Authorized brand service centres se repair aur maintenance — genuine parts, trusted hands, all over India.</p>
+        <ul class="care-benefits">
+          <li><span class="icon">🇮🇳</span> All India Service Available</li>
+          <li><span class="icon">💸</span> Extra Discount &amp; Cashback</li>
+          <li><span class="icon">🛠️</span> Genuine Spare Parts</li>
+          <li><span class="icon">📞</span> Priority Support</li>
+        </ul>
+        <a href="https://wa.me/918226897842?text=Hi%2C%20mujhe%20service%20centre%20booking%20karni%20hai.%20Vehicle%20model%20aur%20location%3A%20" class="btn-care" target="_blank">
+          🟢 Service Book Karein
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- NEW VEHICLE BOOKING -->
 <section class="newveh-section">
   <div class="container">
@@ -663,6 +719,10 @@
       <a href="https://wa.me/918226897842?text=Hi%2C%20mujhe%20nayi%20commercial%20vehicle%20book%20karni%20hai.%20Brand%2FModel%3A%20___%2C%20Budget%3A%20___" class="btn-newveh" target="_blank">
         🚛 Naya Vehicle Book Karein
       </a>
+    </div>
+    <div class="mini-verify">
+      <span>Naya ya purana, har deal verified rakhein</span>
+      <a href="https://wa.me/918226897842?text=Hi%20I%20want%20to%20complete%20%E2%82%B9499%20verification%20for%20Truck%20Mandi.%20Please%20guide%20payment%20process." target="_blank">✅ Verify Now – ₹499</a>
     </div>
   </div>
 </section>
@@ -725,86 +785,6 @@
   </div>
 </section>
 
-<!-- REGIONAL PRESENCE -->
-<section class="region-section">
-  <div class="container">
-    <div class="section-title">Har Rang <span>Apna</span></div>
-    <p class="section-sub">Har state ki apni virasat, apna kaam — Truck Mandi sab jagah</p>
-    <div class="region-grid">
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#D7263D"></div>
-        <div class="region-body">
-          <span class="region-status active">Active Network</span>
-          <h4>Bihar</h4>
-          <div class="art-tag">Madhubani Art</div>
-          <div class="cities">Patna • Muzaffarpur • Gaya • Bhagalpur</div>
-        </div>
-      </div>
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#3FA796"></div>
-        <div class="region-body">
-          <span class="region-status active">Active Network</span>
-          <h4>Uttar Pradesh</h4>
-          <div class="art-tag">Chikankari Embroidery</div>
-          <div class="cities">Lucknow • Kanpur • Noida • Varanasi</div>
-        </div>
-      </div>
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#C77A33"></div>
-        <div class="region-body">
-          <span class="region-status active">Active Network</span>
-          <h4>Jharkhand</h4>
-          <div class="art-tag">Sohrai Mural Art</div>
-          <div class="cities">Ranchi • Jamshedpur • Dhanbad</div>
-        </div>
-      </div>
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#8C1F3A"></div>
-        <div class="region-body">
-          <span class="region-status soon">Expanding Soon</span>
-          <h4>Rajasthan</h4>
-          <div class="art-tag">Bandhani &amp; Mojari Craft</div>
-          <div class="cities">Jaipur • Jodhpur • Udaipur</div>
-        </div>
-      </div>
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#E0559A"></div>
-        <div class="region-body">
-          <span class="region-status soon">Expanding Soon</span>
-          <h4>Gujarat</h4>
-          <div class="art-tag">Kutch Mirror-Work</div>
-          <div class="cities">Ahmedabad • Surat • Rajkot</div>
-        </div>
-      </div>
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#D9A93A"></div>
-        <div class="region-body">
-          <span class="region-status soon">Expanding Soon</span>
-          <h4>Punjab</h4>
-          <div class="art-tag">Phulkari Embroidery</div>
-          <div class="cities">Ludhiana • Amritsar • Jalandhar</div>
-        </div>
-      </div>
-
-      <div class="region-card">
-        <div class="region-bar" style="--rc:#8A5A3B"></div>
-        <div class="region-body">
-          <span class="region-status soon">Expanding Soon</span>
-          <h4>Maharashtra</h4>
-          <div class="art-tag">Warli Art</div>
-          <div class="cities">Mumbai • Pune • Nagpur</div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
 
 <!-- TRUST / COMPANY -->
 <section class="trust-section">
@@ -813,7 +793,7 @@
     <p class="section-sub">A government-registered company you can trust</p>
     <div class="trust-card">
       <div class="trust-logo-block">
-        <div class="big-logo">Truck <span>Mandi</span></div>
+        <img src="truckmandi-logo.png" alt="Truck Mandi Logo" style="width:120px;height:auto;display:block;margin:0 auto 10px;"/>
         <div class="reg-tag">By Maalasu Truck India Pvt. Ltd.</div>
       </div>
       <div class="trust-info">
@@ -861,6 +841,7 @@
 
 <!-- FOOTER -->
 <footer>
+  <img src="truckmandi-logo.png" alt="Truck Mandi" style="width:70px;height:auto;display:block;margin:0 auto 14px;opacity:0.9;"/>
   <p>
     <strong>MAALASU TRUCK INDIA PRIVATE LIMITED</strong><br>
     CIN: U29109BR2024PTC070502 &nbsp;|&nbsp; GST: 10AASCM3353P1Z2<br>
