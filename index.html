@@ -166,7 +166,7 @@
 
   /* road + truck animation */
   .hero-road {
-    position: relative; z-index: 1; height: 110px;
+    position: relative; z-index: 1; height: 120px;
     background: linear-gradient(180deg, #2A2018 0%, #100B07 100%);
     border-top: 3px solid #000;
     overflow: hidden;
@@ -180,17 +180,28 @@
   }
   @keyframes laneMove { from { transform: translate(0,-50%); } to { transform: translate(-70px,-50%); } }
 
-  .truck-wrap {
-    position: absolute; bottom: 6px; left: -260px;
-    width: 230px; height: 100px;
-    animation: driveAcross 16s linear infinite;
+  /* one vehicle drives fully across, THEN the next one starts — controlled by JS below */
+  .veh-wrap {
+    position: absolute; bottom: 4px; height: 108px;
+    left: -320px;
+    opacity: 0;
+  }
+  .veh-wrap svg { width: 100%; height: 100%; display: block; }
+  .veh-wrap.pickup    { width: 140px; }
+  .veh-wrap.truck     { width: 200px; }
+  .veh-wrap.trailer   { width: 280px; }
+  .veh-wrap.dumper    { width: 180px; }
+  .veh-wrap.rickshaw  { width: 110px; }
+  .veh-wrap.jcb       { width: 190px; }
+  .veh-wrap.driving {
+    opacity: 1;
+    animation: driveAcross 11s linear forwards;
   }
   @keyframes driveAcross {
-    0% { left: -260px; }
+    0%   { left: -320px; }
     100% { left: 110%; }
   }
-  .truck-wrap svg { width: 100%; height: 100%; display: block; }
-  .wheel { animation: spin 0.7s linear infinite; transform-origin: center; }
+  .wheel { animation: spin 0.65s linear infinite; transform-origin: center; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .headlamp { animation: blink 2.4s ease-in-out infinite; }
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
@@ -440,6 +451,35 @@
   }
   .btn-newveh:hover { background: #B91E33; transform: translateY(-2px); }
 
+  /* ── LOAN HUB ── */
+  .loan-section { background: var(--ink); }
+  .loan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+  .loan-card {
+    background: var(--ink2); border-radius: 16px; padding: 28px 22px;
+    border: 1px solid rgba(255,255,255,0.07); position: relative; overflow: hidden;
+    display: flex; flex-direction: column; gap: 0;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .loan-card:hover { transform: translateY(-4px); border-color: rgba(255,182,39,0.35); }
+  .loan-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--lc, var(--marigold)); }
+  .loan-card.vehicle  { --lc: #5FE6A0; }
+  .loan-card.business { --lc: #FFB627; }
+  .loan-card.personal { --lc: #F07080; }
+  .loan-card.home     { --lc: #7FB3FF; }
+  .loan-icon { font-size: 32px; margin-bottom: 12px; }
+  .loan-card h3 { font-size: 20px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+  .loan-card .loan-sub { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--lc, var(--marigold)); margin-bottom: 10px; }
+  .loan-card p { color: var(--gray); font-size: 14px; line-height: 1.55; margin-bottom: 16px; }
+  .loan-tags { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 18px; }
+  .loan-tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 50px; font-size: 12px; font-weight: 600; color: #D8CFBF; }
+  .btn-loan {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    text-decoration: none; color: var(--ink); background: var(--lc, var(--marigold));
+    padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 700;
+    transition: all 0.2s; margin-top: auto;
+  }
+  .btn-loan:hover { filter: brightness(0.88); transform: translateY(-2px); }
+
   /* ── HOW IT WORKS ── */
   .how-section { background: var(--ink3); }
   .steps-wrap { display: flex; flex-wrap: wrap; gap: 0; justify-content: center; max-width: 900px; margin: 0 auto; position: relative; }
@@ -652,68 +692,128 @@
       <div class="hero-check"><span class="tick">✔</span> Direct Owner Deals</div>
     </div>
     <div class="hero-btns">
-      <a href="https://wa.me/917549437078?text=Hi%20I%20want%20to%20sell%20my%20commercial%20vehicle.%20Please%20guide%20me%20on%20the%20right%20verification%20plan." class="btn-sell" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20apni%20commercial%20vehicle%20bechni%20hai." class="btn-sell" target="_blank">
         🟢 Sell Your Vehicle
       </a>
-      <a href="https://wa.me/917549437078?text=Hi%20I%20am%20looking%20to%20buy%20a%20commercial%20vehicle.%20Please%20share%20details." class="btn-buy" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20ek%20commercial%20vehicle%20khareedni%20hai." class="btn-buy" target="_blank">
         🔍 Find Vehicles
       </a>
     </div>
   </div>
 
-  <!-- animated road + truck -->
+  <!-- animated road — 4 vehicles convoy -->
   <div class="hero-road">
     <div class="road-lane"></div>
-    <div class="truck-wrap">
-      <svg viewBox="0 0 230 100" xmlns="http://www.w3.org/2000/svg">
-        <!-- container body -->
-        <rect x="5" y="22" width="135" height="50" rx="4" fill="#D7263D" stroke="#160F0B" stroke-width="2"/>
-        <rect x="5" y="22" width="135" height="10" fill="#FFB627"/>
-        <!-- jhalar tassel fringe -->
-        <g fill="#FFB627">
-          <polygon points="10,72 16,72 13,82"/>
-          <polygon points="22,72 28,72 25,82"/>
-          <polygon points="34,72 40,72 37,82"/>
-          <polygon points="46,72 52,72 49,82"/>
-          <polygon points="58,72 64,72 61,82"/>
-          <polygon points="70,72 76,72 73,82"/>
-          <polygon points="82,72 88,72 85,82"/>
-          <polygon points="94,72 100,72 97,82"/>
-          <polygon points="106,72 112,72 109,82"/>
-          <polygon points="118,72 124,72 121,82"/>
-          <polygon points="130,72 136,72 133,82"/>
-        </g>
-        <!-- decorative side stripe -->
-        <rect x="5" y="48" width="135" height="6" fill="#0E6E66"/>
-        <circle cx="35" cy="40" r="9" fill="#FFB627" stroke="#160F0B" stroke-width="1.5"/>
-        <circle cx="70" cy="40" r="9" fill="#FFB627" stroke="#160F0B" stroke-width="1.5"/>
-        <circle cx="105" cy="40" r="9" fill="#FFB627" stroke="#160F0B" stroke-width="1.5"/>
-        <!-- cabin -->
-        <path d="M140,38 L172,38 L186,58 L186,72 L140,72 Z" fill="#0E6E66" stroke="#160F0B" stroke-width="2"/>
-        <rect x="148" y="44" width="22" height="14" rx="2" fill="#BFE9E4"/>
-        <!-- headlamp -->
-        <circle class="headlamp" cx="183" cy="65" r="4" fill="#FFE9A8"/>
-        <!-- garland on bumper -->
-        <g class="garland">
-          <circle cx="138" cy="74" r="3.4" fill="#FFB627"/>
-          <circle cx="144" cy="76" r="3.4" fill="#D7263D"/>
-          <circle cx="150" cy="74" r="3.4" fill="#FFB627"/>
-        </g>
-        <!-- wheels -->
-        <g class="wheel" style="transform-box:fill-box;" >
-          <circle cx="40" cy="84" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/>
-          <circle cx="40" cy="84" r="4" fill="#FFB627"/>
-        </g>
-        <g class="wheel" style="transform-box:fill-box;">
-          <circle cx="100" cy="84" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/>
-          <circle cx="100" cy="84" r="4" fill="#FFB627"/>
-        </g>
-        <g class="wheel" style="transform-box:fill-box;">
-          <circle cx="165" cy="84" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/>
-          <circle cx="165" cy="84" r="4" fill="#FFB627"/>
-        </g>
+
+    <!-- 1. PICKUP -->
+    <div class="veh-wrap pickup">
+      <svg viewBox="0 0 140 108" xmlns="http://www.w3.org/2000/svg">
+        <rect x="50" y="36" width="72" height="36" rx="3" fill="#0E6E66" stroke="#160F0B" stroke-width="2"/>
+        <rect x="50" y="36" width="72" height="8" fill="#FFB627"/>
+        <path d="M10,72 L10,44 L36,44 L50,60 L50,72 Z" fill="#D7263D" stroke="#160F0B" stroke-width="2"/>
+        <rect x="15" y="48" width="18" height="12" rx="1" fill="#BFE9E4"/>
+        <circle class="headlamp" cx="11" cy="66" r="3.5" fill="#FFE9A8"/>
+        <g class="garland"><circle cx="52" cy="73" r="2.6" fill="#FFB627"/><circle cx="58" cy="75" r="2.6" fill="#D7263D"/><circle cx="64" cy="73" r="2.6" fill="#FFB627"/></g>
+        <rect x="8" y="72" width="116" height="5" fill="#160F0B"/>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="30" cy="86" r="12" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="30" cy="86" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="100" cy="86" r="12" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="100" cy="86" r="4" fill="#FFB627"/></g>
       </svg>
     </div>
+
+    <!-- 2. TRUCK (Indian decorated) -->
+    <div class="veh-wrap truck">
+      <svg viewBox="0 0 200 108" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="24" width="120" height="48" rx="3" fill="#D7263D" stroke="#160F0B" stroke-width="2"/>
+        <rect x="5" y="24" width="120" height="10" fill="#FFB627"/>
+        <rect x="5" y="52" width="120" height="7" fill="#0E6E66"/>
+        <g fill="#FFB627"><polygon points="10,72 16,72 13,82"/><polygon points="24,72 30,72 27,82"/><polygon points="38,72 44,72 41,82"/><polygon points="52,72 58,72 55,82"/><polygon points="66,72 72,72 69,82"/><polygon points="80,72 86,72 83,82"/><polygon points="94,72 100,72 97,82"/><polygon points="108,72 114,72 111,82"/></g>
+        <circle cx="35" cy="45" r="8" fill="#FFB627" stroke="#160F0B" stroke-width="1.4"/>
+        <circle cx="70" cy="45" r="8" fill="#FFB627" stroke="#160F0B" stroke-width="1.4"/>
+        <circle cx="105" cy="45" r="8" fill="#FFB627" stroke="#160F0B" stroke-width="1.4"/>
+        <path d="M125,40 L158,40 L174,62 L174,74 L125,74 Z" fill="#0E6E66" stroke="#160F0B" stroke-width="2"/>
+        <rect x="133" y="46" width="22" height="14" rx="1" fill="#BFE9E4"/>
+        <circle class="headlamp" cx="171" cy="68" r="4" fill="#FFE9A8"/>
+        <g class="garland"><circle cx="123" cy="76" r="3" fill="#FFB627"/><circle cx="129" cy="78" r="3" fill="#D7263D"/><circle cx="135" cy="76" r="3" fill="#FFB627"/></g>
+        <rect x="4" y="74" width="172" height="5" fill="#160F0B"/>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="32" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="32" cy="88" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="92" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="92" cy="88" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="154" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="154" cy="88" r="4" fill="#FFB627"/></g>
+      </svg>
+    </div>
+
+    <!-- 3. TRAILER (long hauler) -->
+    <div class="veh-wrap trailer">
+      <svg viewBox="0 0 280 108" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="22" width="180" height="50" rx="3" fill="#D7263D" stroke="#160F0B" stroke-width="2"/>
+        <rect x="5" y="22" width="180" height="10" fill="#FFB627"/>
+        <rect x="5" y="52" width="180" height="6" fill="#0E6E66"/>
+        <g fill="#FFB627"><polygon points="10,72 16,72 13,84"/><polygon points="26,72 32,72 29,84"/><polygon points="42,72 48,72 45,84"/><polygon points="58,72 64,72 61,84"/><polygon points="74,72 80,72 77,84"/><polygon points="90,72 96,72 93,84"/><polygon points="106,72 112,72 109,84"/><polygon points="122,72 128,72 125,84"/><polygon points="138,72 144,72 141,84"/><polygon points="154,72 160,72 157,84"/><polygon points="170,72 176,72 173,84"/></g>
+        <circle cx="45" cy="43" r="7" fill="#FFB627" stroke="#160F0B" stroke-width="1.2"/>
+        <circle cx="92" cy="43" r="7" fill="#FFB627" stroke="#160F0B" stroke-width="1.2"/>
+        <circle cx="139" cy="43" r="7" fill="#FFB627" stroke="#160F0B" stroke-width="1.2"/>
+        <path d="M185,38 L220,38 L238,60 L238,74 L185,74 Z" fill="#0E6E66" stroke="#160F0B" stroke-width="2"/>
+        <rect x="193" y="44" width="24" height="16" rx="1" fill="#BFE9E4"/>
+        <circle class="headlamp" cx="235" cy="68" r="4" fill="#FFE9A8"/>
+        <g class="garland"><circle cx="183" cy="76" r="3" fill="#FFB627"/><circle cx="189" cy="78" r="3" fill="#D7263D"/><circle cx="195" cy="76" r="3" fill="#FFB627"/></g>
+        <rect x="4" y="74" width="236" height="5" fill="#160F0B"/>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="30" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="30" cy="88" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="100" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="100" cy="88" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="160" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="160" cy="88" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="215" cy="88" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="215" cy="88" r="4" fill="#FFB627"/></g>
+      </svg>
+    </div>
+
+    <!-- 4. DUMPER/TIPPER -->
+    <div class="veh-wrap dumper">
+      <svg viewBox="0 0 180 108" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10,72 L10,46 L32,46 L44,62 L44,72 Z" fill="#0E6E66" stroke="#160F0B" stroke-width="2"/>
+        <rect x="16" y="50" width="18" height="12" rx="1" fill="#BFE9E4"/>
+        <circle class="headlamp" cx="11" cy="67" r="3.5" fill="#FFE9A8"/>
+        <path d="M44,72 L44,42 L88,24 L140,30 L140,72 Z" fill="#FFB627" stroke="#160F0B" stroke-width="2"/>
+        <line x1="70" y1="72" x2="74" y2="31" stroke="#160F0B" stroke-width="1.4"/>
+        <line x1="96" y1="72" x2="98" y2="26" stroke="#160F0B" stroke-width="1.4"/>
+        <line x1="118" y1="72" x2="119" y2="28" stroke="#160F0B" stroke-width="1.4"/>
+        <rect x="44" y="54" width="96" height="8" fill="#D7263D"/>
+        <g class="garland"><circle cx="46" cy="73" r="2.6" fill="#FFB627"/><circle cx="52" cy="75" r="2.6" fill="#D7263D"/><circle cx="58" cy="73" r="2.6" fill="#FFB627"/></g>
+        <rect x="8" y="72" width="134" height="5" fill="#160F0B"/>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="32" cy="86" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="32" cy="86" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="88" cy="86" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="88" cy="86" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="124" cy="86" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="124" cy="86" r="4" fill="#FFB627"/></g>
+      </svg>
+    </div>
+
+    <!-- 5. AUTO-RICKSHAW (Indian tuk-tuk) -->
+    <div class="veh-wrap rickshaw">
+      <svg viewBox="0 0 110 108" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18,72 L18,44 C18,38 22,34 28,34 L64,34 C70,34 74,38 74,44 L74,72 Z" fill="#FFB627" stroke="#160F0B" stroke-width="2"/>
+        <path d="M22,44 L70,44 L70,58 L22,58 Z" fill="#0E6E66" stroke="#160F0B" stroke-width="1.6"/>
+        <rect x="26" y="46" width="16" height="10" rx="1" fill="#BFE9E4"/>
+        <rect x="50" y="46" width="16" height="10" rx="1" fill="#BFE9E4"/>
+        <path d="M74,50 L92,50 L92,72 L74,72 Z" fill="#D7263D" stroke="#160F0B" stroke-width="2"/>
+        <circle class="headlamp" cx="90" cy="62" r="3.2" fill="#FFE9A8"/>
+        <g class="garland"><circle cx="20" cy="73" r="2.4" fill="#D7263D"/><circle cx="26" cy="75" r="2.4" fill="#FFB627"/><circle cx="32" cy="73" r="2.4" fill="#D7263D"/></g>
+        <rect x="16" y="72" width="78" height="4" fill="#160F0B"/>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="30" cy="86" r="11" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="30" cy="86" r="3.5" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="80" cy="86" r="11" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="80" cy="86" r="3.5" fill="#FFB627"/></g>
+      </svg>
+    </div>
+
+    <!-- 6. JCB (excavator loader) -->
+    <div class="veh-wrap jcb">
+      <svg viewBox="0 0 190 108" xmlns="http://www.w3.org/2000/svg">
+        <rect x="34" y="46" width="80" height="30" rx="3" fill="#FFB627" stroke="#160F0B" stroke-width="2"/>
+        <path d="M40,46 L58,46 L58,26 L70,26 L70,46 L74,46 L74,30 L84,30 L84,46" fill="none" stroke="#160F0B" stroke-width="2"/>
+        <rect x="40" y="30" width="30" height="16" rx="1" fill="#BFE9E4" stroke="#160F0B" stroke-width="1.6"/>
+        <path d="M114,58 L150,50 L166,50 L166,42 L176,42 L172,58 L150,66 L114,66 Z" fill="#D7263D" stroke="#160F0B" stroke-width="2"/>
+        <path d="M172,42 L186,38 L188,44 L176,50 Z" fill="#160F0B"/>
+        <circle class="headlamp" cx="112" cy="58" r="3" fill="#FFE9A8"/>
+        <g class="garland"><circle cx="36" cy="77" r="2.6" fill="#D7263D"/><circle cx="42" cy="79" r="2.6" fill="#FFB627"/><circle cx="48" cy="77" r="2.6" fill="#D7263D"/></g>
+        <rect x="32" y="76" width="96" height="5" fill="#160F0B"/>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="56" cy="90" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="56" cy="90" r="4" fill="#FFB627"/></g>
+        <g class="wheel" style="transform-box:fill-box;"><circle cx="104" cy="90" r="13" fill="#1A130D" stroke="#FFB627" stroke-width="2"/><circle cx="104" cy="90" r="4" fill="#FFB627"/></g>
+      </svg>
+    </div>
+
   </div>
 </section>
 
@@ -773,7 +873,7 @@
         <div class="benefit-amount">FREE</div>
       </li>
     </ul>
-    <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20Truck%20Mandi%20verification%20plan%20ke%20baare%20mein%20jaankari%20chahiye." class="modal-cta" target="_blank">
+    <a href="https://wa.me/917549437078?text=Mujhe%20Truck%20Mandi%20verification%20ke%20baare%20mein%20jaankari%20chahiye." class="modal-cta" target="_blank">
       ✅ Abhi Verify Karein – Plan Choose Karein
     </a>
   </div>
@@ -798,7 +898,7 @@
           <li><span class="pk">🛡️</span> Insurance Cashback ₹3,000</li>
           <li><span class="pk">🔧</span> Tyre Discount ₹2,000</li>
         </ul>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20main%20commercial%20vehicle%20khareedna%20chahta%20hoon.%20Buyer%20verification%20%E2%82%B9999%20ke%20liye%20guide%20karein." class="btn-plan" target="_blank">🟢 Buyer Verify – ₹999</a>
+        <a href="https://wa.me/917549437078?text=Mujhe%20commercial%20vehicle%20khareedni%20hai.%20Buyer%20verification%20%E2%82%B9999%20ke%20baare%20mein%20bataiye." class="btn-plan" target="_blank">🟢 Buyer Verify – ₹999</a>
       </div>
       <div class="plan-card seller">
         <span class="plan-badge">For Sellers</span>
@@ -813,7 +913,7 @@
           <li><span class="pk">🛡️</span> Insurance Cashback ₹3,000</li>
           <li><span class="pk">⚡</span> Fast Response Support</li>
         </ul>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20main%20apni%20commercial%20vehicle%20bechna%20chahta%20hoon.%20Seller%20verification%20%E2%82%B9199%20ke%20liye%20guide%20karein." class="btn-plan" target="_blank">🟠 Seller Verify – ₹199</a>
+        <a href="https://wa.me/917549437078?text=Mujhe%20apni%20commercial%20vehicle%20bechni%20hai.%20Seller%20verification%20%E2%82%B9199%20ke%20baare%20mein%20bataiye." class="btn-plan" target="_blank">🟠 Seller Verify – ₹199</a>
       </div>
       <div class="plan-card newveh">
         <span class="plan-badge">New Vehicle</span>
@@ -828,7 +928,7 @@
           <li><span class="pk">🏷️</span> Tata, Ashok Leyland, Mahindra & more</li>
           <li><span class="pk">⚡</span> Fast Dealer Connect</li>
         </ul>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20nayi%20commercial%20vehicle%20book%20karni%20hai.%20New%20Vehicle%20verification%20%E2%82%B9199%20ke%20liye%20guide%20karein." class="btn-plan" target="_blank">🔴 New Vehicle – ₹199</a>
+        <a href="https://wa.me/917549437078?text=Nayi%20commercial%20vehicle%20book%20karni%20hai.%20New%20Vehicle%20%E2%82%B9199%20plan%20ke%20baare%20mein%20bataiye." class="btn-plan" target="_blank">🔴 New Vehicle – ₹199</a>
       </div>
     </div>
     <div class="benefits-trigger-wrap">
@@ -843,25 +943,25 @@
     <div class="section-title">Our <span>Services</span></div>
     <p class="section-sub">Har zaruurat ke liye hum hain tayaar</p>
     <div class="services-grid">
-      <a href="https://wa.me/917549437078?text=Hi%20I%20am%20looking%20to%20buy%20a%20commercial%20vehicle." class="service-card" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20ek%20commercial%20vehicle%20khareedni%20hai." class="service-card" target="_blank">
         <div class="service-icon">🚛</div>
         <h3>Buy Vehicle</h3>
         <p>Find verified trucks, pickups &amp; commercial vehicles at best prices across India.</p>
         <div class="service-arrow">→</div>
       </a>
-      <a href="https://wa.me/917549437078?text=Hi%20I%20want%20to%20sell%20my%20commercial%20vehicle." class="service-card" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20apni%20commercial%20vehicle%20bechni%20hai." class="service-card" target="_blank">
         <div class="service-icon">💰</div>
         <h3>Sell Vehicle</h3>
         <p>List your vehicle and connect with genuine buyers directly. No middleman.</p>
         <div class="service-arrow">→</div>
       </a>
-      <a href="https://wa.me/917549437078?text=Hi%20I%20need%20loan%20for%20commercial%20vehicle." class="service-card" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20commercial%20vehicle%20ke%20liye%20loan%20chahiye." class="service-card" target="_blank">
         <div class="service-icon">🏦</div>
         <h3>Loan Assistance</h3>
         <p>Get easy vehicle loan support with fast processing and best interest rates.</p>
         <div class="service-arrow">→</div>
       </a>
-      <a href="https://wa.me/917549437078?text=Hi%20I%20need%20insurance%20for%20my%20vehicle." class="service-card" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20apni%20vehicle%20ka%20insurance%20karwana%20hai." class="service-card" target="_blank">
         <div class="service-icon">🛡️</div>
         <h3>Insurance Support</h3>
         <p>Protect your commercial vehicle with the right insurance plan at right price.</p>
@@ -870,7 +970,7 @@
     </div>
     <div class="mini-verify">
       <span>Buy ya Sell se pehle apna account verify zaroor karein</span>
-      <a href="https://wa.me/917549437078?text=Hi%20I%20want%20to%20complete%20verification%20for%20Truck%20Mandi.%20Please%20guide%20me%20on%20the%20right%20plan." target="_blank">✅ Verify Now – See Plans</a>
+      <a href="https://wa.me/917549437078?text=Mujhe%20Truck%20Mandi%20ka%20verification%20plan%20choose%20karna%20hai." target="_blank">✅ Verify Now – See Plans</a>
     </div>
   </div>
 </section>
@@ -889,7 +989,7 @@
         </div>
         <h3>🧑‍✈️ Driver Hire Karein</h3>
         <p>Apne truck ya commercial vehicle ke liye verified, trained driver dhoondein. 3 mahine tak unlimited candidates milenge — seedha WhatsApp par.</p>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20ek%20verified%20driver%20chahiye.%20Driver%20Hire%20%E2%82%B9999%20plan%20ke%20liye%20guide%20karein.%20Vehicle%20type%20aur%20route%3A%20" class="btn-driver" target="_blank">
+        <a href="https://wa.me/917549437078?text=Mujhe%20ek%20verified%20driver%20chahiye.%20Driver%20Hire%20%E2%82%B9999%20plan%20ke%20baare%20mein%20bataiye." class="btn-driver" target="_blank">
           🟢 Driver Hire – ₹999
         </a>
       </div>
@@ -901,7 +1001,7 @@
         </div>
         <h3>🪪 Driver Job Paayen</h3>
         <p>Experienced driver hain aur naya kaam chahiye? Apna naam, license type, experience aur location bhejein — hum transport owners se bilkul free mein connect karayenge.</p>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20driver%20ki%20job%20chahiye.%20Mera%20naam%3A%20___%2C%20License%20type%3A%20___%2C%20Experience%3A%20___%2C%20Location%3A%20___" class="btn-driver" target="_blank">
+        <a href="https://wa.me/917549437078?text=Mujhe%20driving%20job%20chahiye." class="btn-driver" target="_blank">
           🔵 Driver Job – Bilkul Free Apply Karein
         </a>
       </div>
@@ -925,7 +1025,7 @@
           <li><span class="icon">🏷️</span> Top Branded Tyres</li>
           <li><span class="icon">⚡</span> Fast Fitting Support</li>
         </ul>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20tyre%20booking%20karni%20hai.%20Vehicle%20model%20aur%20tyre%20size%3A%20" class="btn-care" target="_blank">
+        <a href="https://wa.me/917549437078?text=Mujhe%20tyre%20booking%20karni%20hai." class="btn-care" target="_blank">
           🟢 Tyre Book Karein
         </a>
       </div>
@@ -939,7 +1039,7 @@
           <li><span class="icon">🛠️</span> Genuine Spare Parts</li>
           <li><span class="icon">📞</span> Priority Support</li>
         </ul>
-        <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20service%20centre%20booking%20karni%20hai.%20Vehicle%20model%20aur%20location%3A%20" class="btn-care" target="_blank">
+        <a href="https://wa.me/917549437078?text=Mujhe%20service%20centre%20booking%20karni%20hai." class="btn-care" target="_blank">
           🟢 Service Book Karein
         </a>
       </div>
@@ -961,13 +1061,77 @@
         <span class="brand-chip">Eicher</span>
         <span class="brand-chip">BharatBenz</span>
       </div>
-      <a href="https://wa.me/917549437078?text=Hi%2C%20mujhe%20nayi%20commercial%20vehicle%20book%20karni%20hai.%20Brand%2FModel%3A%20___%2C%20Budget%3A%20___" class="btn-newveh" target="_blank">
+      <a href="https://wa.me/917549437078?text=Nayi%20commercial%20vehicle%20book%20karni%20hai." class="btn-newveh" target="_blank">
         🚛 Naya Vehicle Book Karein
       </a>
     </div>
     <div class="mini-verify">
       <span>Naya ya purana, har deal verified rakhein</span>
-      <a href="https://wa.me/917549437078?text=Hi%20I%20want%20to%20complete%20verification%20for%20Truck%20Mandi.%20Please%20guide%20me%20on%20the%20right%20plan." target="_blank">✅ Verify Now – See Plans</a>
+      <a href="https://wa.me/917549437078?text=Mujhe%20Truck%20Mandi%20ka%20verification%20plan%20choose%20karna%20hai." target="_blank">✅ Verify Now – See Plans</a>
+    </div>
+  </div>
+</section>
+
+<!-- LOAN HUB -->
+<section class="loan-section">
+  <div class="container">
+    <div class="section-title">Loan <span>Hub</span></div>
+    <p class="section-sub">Har tarah ka loan — vehicle se ghar tak, ek jagah milega</p>
+    <div class="loan-grid">
+
+      <div class="loan-card vehicle">
+        <div class="loan-icon">🚛</div>
+        <div class="loan-sub">Vehicle Loan</div>
+        <h3>Vehicle Loan</h3>
+        <p>Naya truck, used vehicle, ya refinancing — sabke liye best rate pe loan. Koi bhi commercial vehicle, car, bike, tractor — sab milega.</p>
+        <div class="loan-tags">
+          <span class="loan-tag">New Vehicle Loan</span>
+          <span class="loan-tag">Used Vehicle Loan</span>
+          <span class="loan-tag">Refinance</span>
+          <span class="loan-tag">All Vehicles</span>
+        </div>
+        <a href="https://wa.me/917549437078?text=Mujhe%20vehicle%20loan%20chahiye." class="btn-loan" target="_blank">🟢 Vehicle Loan Ke Liye Baat Karein</a>
+      </div>
+
+      <div class="loan-card business">
+        <div class="loan-icon">🏢</div>
+        <div class="loan-sub">Business Loan</div>
+        <h3>Business Loan</h3>
+        <p>Apna business badhaao — secured ya unsecured loan, dono options available hain. Transport, logistics, ya koi bhi business ke liye.</p>
+        <div class="loan-tags">
+          <span class="loan-tag">Secured Loan</span>
+          <span class="loan-tag">Unsecured Loan</span>
+          <span class="loan-tag">Fast Approval</span>
+        </div>
+        <a href="https://wa.me/917549437078?text=Mujhe%20business%20loan%20chahiye." class="btn-loan" target="_blank">🟡 Business Loan Ke Liye Baat Karein</a>
+      </div>
+
+      <div class="loan-card personal">
+        <div class="loan-icon">👤</div>
+        <div class="loan-sub">Personal Loan</div>
+        <h3>Personal Loan</h3>
+        <p>Salaried ya non-salaried, business person — sabko personal loan mil sakta hai. Bina zyada kagaj-patra ke jaldi process hoga.</p>
+        <div class="loan-tags">
+          <span class="loan-tag">Salaried</span>
+          <span class="loan-tag">Self Employed</span>
+          <span class="loan-tag">Quick Process</span>
+        </div>
+        <a href="https://wa.me/917549437078?text=Mujhe%20personal%20loan%20chahiye." class="btn-loan" target="_blank">🔴 Personal Loan Ke Liye Baat Karein</a>
+      </div>
+
+      <div class="loan-card home">
+        <div class="loan-icon">🏠</div>
+        <div class="loan-sub">Home & Property Loan</div>
+        <h3>Home Loan</h3>
+        <p>Ghar khareedna hai ya property pe loan chahiye — hamere partner banks aur NBFCs ke through best deal milegi. Home loan aur LAP dono available.</p>
+        <div class="loan-tags">
+          <span class="loan-tag">Home Loan</span>
+          <span class="loan-tag">Loan Against Property</span>
+          <span class="loan-tag">Best Rates</span>
+        </div>
+        <a href="https://wa.me/917549437078?text=Mujhe%20home%20loan%20ya%20property%20loan%20chahiye." class="btn-loan" target="_blank">🔵 Home Loan Ke Liye Baat Karein</a>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1058,7 +1222,7 @@
   <div class="section-title">Start Today –<br><span>Buy or Sell Easily</span></div>
   <p>Abhi WhatsApp karo ya call karo – ek click mein shuru karo</p>
   <div class="cta-btns">
-    <a href="https://wa.me/917549437078?text=Hi%20I%20want%20to%20sell%20my%20vehicle" class="btn-wa-cta" target="_blank">
+    <a href="https://wa.me/917549437078?text=Mujhe%20apni%20vehicle%20sell%20karni%20hai." class="btn-wa-cta" target="_blank">
       📱 Post Vehicle on WhatsApp
     </a>
     <a href="tel:+917549437078" class="btn-call-cta">
@@ -1074,7 +1238,7 @@
     <p class="section-sub">Hum hamesha available hain – WhatsApp ya Call karo</p>
     <a href="tel:+917549437078" class="contact-number">+91 75494 37078</a>
     <div class="contact-btns">
-      <a href="https://wa.me/917549437078?text=Hi%20I%20want%20details%20about%20Truck%20Mandi" class="btn-contact-wa" target="_blank">
+      <a href="https://wa.me/917549437078?text=Mujhe%20Truck%20Mandi%20ke%20baare%20mein%20jankari%20chahiye." class="btn-contact-wa" target="_blank">
         💬 WhatsApp Karo
       </a>
       <a href="tel:+917549437078" class="btn-contact-call">
@@ -1097,7 +1261,7 @@
 
 <!-- FLOATING BUTTONS -->
 <div class="float-buttons">
-  <a href="https://wa.me/917549437078?text=Hi%20I%20need%20help%20regarding%20Truck%20Mandi" class="float-wa" target="_blank" title="WhatsApp">💬</a>
+  <a href="https://wa.me/917549437078?text=Mujhe%20Truck%20Mandi%20se%20madad%20chahiye." class="float-wa" target="_blank" title="WhatsApp">💬</a>
   <a href="tel:+917549437078" class="float-call" title="Call Now">📞</a>
 </div>
 
@@ -1116,6 +1280,34 @@
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeBenefits();
   });
+
+  // ── Sequential vehicle convoy: one vehicle crosses fully, then the next starts ──
+  (function () {
+    var wraps = Array.prototype.slice.call(document.querySelectorAll('.hero-road .veh-wrap'));
+    if (!wraps.length) return;
+    var order = wraps.sort(function () {
+      return 0; // keep DOM order: pickup, truck, trailer, dumper, rickshaw, jcb
+    });
+    var idx = 0;
+
+    function playNext() {
+      var current = order[idx];
+      // reset previous vehicle fully off-screen and hidden
+      current.classList.remove('driving');
+      // force reflow so the animation restarts cleanly next time this element is reused
+      void current.offsetWidth;
+
+      current.classList.add('driving');
+      current.addEventListener('animationend', function onEnd() {
+        current.removeEventListener('animationend', onEnd);
+        current.classList.remove('driving');
+        idx = (idx + 1) % order.length; // move to next vehicle; loops only after all have gone
+        playNext();
+      });
+    }
+
+    playNext();
+  })();
 </script>
 </body>
 </html>
