@@ -275,13 +275,6 @@
   }
   .rc-check-form input::placeholder { color: var(--gray); font-weight: 500; }
   .rc-check-form input:focus { outline: none; border-color: var(--orange); background: rgba(255,255,255,0.1); }
-  .rc-check-form input.field-error { border-color: var(--vermilion); background: rgba(215,38,61,0.08); }
-  .rc-check-form input.field-error:focus { border-color: var(--vermilion); }
-  .field-error-msg {
-    width: 100%; text-align: left; font-size: 12.5px; font-weight: 700;
-    color: #F5B4BC; margin-top: -6px; padding-left: 4px; display: none;
-  }
-  .field-error-msg.show { display: block; }
   .btn-rc-check {
     flex: 1; min-width: 200px;
     background: var(--orange); color: #fff; border: none;
@@ -665,6 +658,7 @@
 </style>
 </head>
 <body>
+
 <!-- NAV -->
 <nav>
   <div class="logo-wrap">
@@ -919,11 +913,9 @@
     <div class="rc-check-title">Free Vehicle <span>RC Check</span></div>
     <p class="rc-check-sub">Apna vehicle number daalein, poori RC details <b>WhatsApp par free</b> mein paayein</p>
 
-    <form class="rc-check-form" id="rcCheckForm" novalidate>
+    <form class="rc-check-form" id="rcCheckForm">
       <input type="text" id="vehicleNumber" placeholder="Vehicle Number (e.g. UP52AT7974)" required>
-      <span class="field-error-msg" id="vehicleNumberError">⚠️ Sahi vehicle number daalein, jaise UP52AT7974</span>
-      <input type="tel" id="whatsappNumber" placeholder="WhatsApp Number (10 digit)" required pattern="[0-9]{10}" maxlength="10">
-      <span class="field-error-msg" id="whatsappNumberError">⚠️ 10 digit ka sahi WhatsApp number daalein</span>
+      <input type="tel" id="whatsappNumber" placeholder="+91 WhatsApp Number" required pattern="(\+91)?[0-9]{10}" maxlength="13">
       <button type="submit" class="btn-rc-check" id="rcCheckBtn">🔍 Check RC Details</button>
     </form>
     <p class="rc-check-note">⏱️ Details 30 second ke andar aapke WhatsApp par bhej di jayengi</p>
@@ -938,62 +930,14 @@
   var btn = document.getElementById('rcCheckBtn');
   var statusMsg = document.getElementById('rcStatusMsg');
 
-  var vehicleInput = document.getElementById('vehicleNumber');
-  var whatsappInput = document.getElementById('whatsappNumber');
-  var vehicleError = document.getElementById('vehicleNumberError');
-  var whatsappError = document.getElementById('whatsappNumberError');
-
-  // Indian vehicle number format: 2 letters (state) + 1-2 digits (RTO code) +
-  // 0-3 letters (series, optional) + 4 digits (unique number)
-  // e.g. UP52AT7974, UP30RF7807, MH12AB1234, DL01A1234
-  var VEHICLE_REGEX = /^[A-Z]{2}[0-9]{1,2}[A-Z]{0,3}[0-9]{4}$/;
-  var WHATSAPP_REGEX = /^[0-9]{10}$/;
-
-  function validateVehicle() {
-    var val = vehicleInput.value.trim().toUpperCase().replace(/\s|-/g, '');
-    var isValid = VEHICLE_REGEX.test(val);
-    vehicleInput.classList.toggle('field-error', val.length > 0 && !isValid);
-    vehicleError.classList.toggle('show', val.length > 0 && !isValid);
-    return isValid;
-  }
-
-  function validateWhatsapp() {
-    var val = whatsappInput.value.trim();
-    var isValid = WHATSAPP_REGEX.test(val);
-    whatsappInput.classList.toggle('field-error', val.length > 0 && !isValid);
-    whatsappError.classList.toggle('show', val.length > 0 && !isValid);
-    return isValid;
-  }
-
-  vehicleInput.addEventListener('input', validateVehicle);
-  vehicleInput.addEventListener('blur', validateVehicle);
-  whatsappInput.addEventListener('input', validateWhatsapp);
-  whatsappInput.addEventListener('blur', validateWhatsapp);
-
   // 🔧 Apna Apps Script Web App URL yahan daalein (Deploy > New deployment > Web app se milega)
   var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrhrVkTtVCxfIofAsiP90Hme4nYO1ckOpBiPjATf-8yz5HAwRUCcZgiVauZJPthHDC9A/exec";
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    var vehicleOk = validateVehicle();
-    var whatsappOk = validateWhatsapp();
-
-    var vehicleNo = vehicleInput.value.trim().toUpperCase().replace(/\s|-/g, '');
-    var whatsappNo = whatsappInput.value.trim();
-
-    if (!vehicleNo || !vehicleOk) {
-      vehicleInput.classList.add('field-error');
-      vehicleError.classList.add('show');
-      vehicleInput.focus();
-      return;
-    }
-    if (!whatsappNo || !whatsappOk) {
-      whatsappInput.classList.add('field-error');
-      whatsappError.classList.add('show');
-      whatsappInput.focus();
-      return;
-    }
+    var vehicleNo = document.getElementById('vehicleNumber').value.trim().toUpperCase();
+    var whatsappNo = document.getElementById('whatsappNumber').value.trim().replace(/\+/g, '');
 
     btn.disabled = true;
     btn.innerText = "⏳ Processing...";
@@ -1011,10 +955,6 @@
         btn.disabled = false;
         btn.innerText = "🔍 Check RC Details";
         form.reset();
-        vehicleInput.classList.remove('field-error');
-        whatsappInput.classList.remove('field-error');
-        vehicleError.classList.remove('show');
-        whatsappError.classList.remove('show');
       }, 3000);
     })
     .catch(function () {
@@ -1026,6 +966,7 @@
   });
 })();
 </script>
+
 <!-- BENEFITS POPUP -->
 <div class="benefits-overlay" id="benefitsOverlay">
   <div class="benefits-modal">
