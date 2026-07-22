@@ -220,21 +220,61 @@
   .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 32px; line-height: 1; color: #fff; }
   .stat-label { font-size: 12px; color: rgba(255,255,255,0.85); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
 
-  /* ── RC CHECK SECTION ── */
+  /* ── RC CHECK SECTION (distinct teal/gold theme + animated scanner) ── */
   .rc-check-section {
-    background: linear-gradient(135deg, #1E1611 0%, #271C15 100%);
-    border-bottom: 2px solid var(--orange);
-    padding: 56px 20px;
+    background: linear-gradient(135deg, #062626 0%, #0A1F1D 45%, #0E1512 100%);
+    border-top: 2px solid var(--teal);
+    border-bottom: 2px solid var(--marigold);
+    padding: 60px 20px;
     position: relative;
     overflow: hidden;
   }
   .rc-check-section::before {
     content: '';
-    position: absolute; top: -60%; right: -10%; width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(255,107,0,0.12) 0%, transparent 70%);
+    position: absolute; top: -50%; right: -15%; width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(14,110,102,0.28) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .rc-check-section::after {
+    content: '';
+    position: absolute; bottom: -40%; left: -10%; width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(255,182,39,0.14) 0%, transparent 70%);
     pointer-events: none;
   }
   .rc-check-wrap { max-width: 760px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
+
+  /* Animated radar/scanner icon */
+  .rc-scanner {
+    width: 92px; height: 92px; margin: 0 auto 18px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .rc-scanner-ring {
+    position: absolute; inset: 0;
+    border: 2px solid rgba(95,224,210,0.5);
+    border-radius: 50%;
+    animation: rcPulseRing 2.4s ease-out infinite;
+  }
+  .rc-scanner-ring:nth-child(2) { animation-delay: 0.8s; }
+  .rc-scanner-ring:nth-child(3) { animation-delay: 1.6s; }
+  @keyframes rcPulseRing {
+    0%   { transform: scale(0.5); opacity: 1; border-color: rgba(95,224,210,0.7); }
+    100% { transform: scale(1.4); opacity: 0; border-color: rgba(255,182,39,0.2); }
+  }
+  .rc-scanner-core {
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(145deg, var(--teal), #0A4B45);
+    border: 2px solid var(--marigold);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 0 24px rgba(95,224,210,0.45);
+    animation: rcCoreSpin 3.5s linear infinite;
+  }
+  @keyframes rcCoreSpin {
+    0%, 92%, 100% { transform: rotate(0deg); }
+    46% { transform: rotate(360deg); }
+  }
+
   .rc-check-logo-row {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     margin-bottom: 6px;
@@ -244,7 +284,7 @@
     font-family: 'Rajdhani', sans-serif; font-weight: 700; text-transform: uppercase;
     font-size: 20px; letter-spacing: 1px; color: var(--cream);
   }
-  .rc-check-brand span { color: var(--orange); }
+  .rc-check-brand span { color: #5FE0D2; }
   .rc-check-title {
     font-family: 'Rajdhani', 'Noto Sans Devanagari', sans-serif;
     font-weight: 700; text-transform: uppercase;
@@ -252,15 +292,27 @@
     letter-spacing: 0.5px;
     margin-bottom: 10px;
   }
-  .rc-check-title span { color: var(--orange); }
+  .rc-check-title span { color: #5FE0D2; }
   .rc-check-sub {
-    color: #ECDFC8; font-size: 15px; font-weight: 600; margin-bottom: 28px;
+    color: #ECDFC8; font-size: 15px; font-weight: 600; margin-bottom: 24px;
   }
   .rc-check-sub b { color: var(--marigold); }
+
+  .rc-whatsapp-required {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(37,211,102,0.14);
+    border: 1.5px solid rgba(37,211,102,0.5);
+    color: #B7F0CE;
+    padding: 8px 18px; border-radius: 50px;
+    font-size: 13.5px; font-weight: 700;
+    margin-bottom: 24px;
+  }
+  .rc-whatsapp-required .wa-ic { font-size: 17px; }
+
   .rc-check-form {
     display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
-    background: rgba(0,0,0,0.28);
-    border: 1px solid rgba(255,182,39,0.3);
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(95,224,210,0.35);
     border-radius: 16px;
     padding: 22px;
   }
@@ -274,27 +326,23 @@
     letter-spacing: 0.5px;
   }
   .rc-check-form input::placeholder { color: var(--gray); font-weight: 500; }
-  .rc-check-form input:focus { outline: none; border-color: var(--orange); background: rgba(255,255,255,0.1); }
+  .rc-check-form input:focus { outline: none; border-color: #5FE0D2; background: rgba(255,255,255,0.1); }
   .btn-rc-check {
-    flex: 1; min-width: 200px;
-    background: var(--orange); color: #fff; border: none;
+    flex: 1; min-width: 220px;
+    background: linear-gradient(135deg, var(--teal), #0A4B45);
+    color: #fff; border: 1.5px solid var(--marigold);
     padding: 14px 24px; border-radius: 8px;
     font-size: 16px; font-weight: 700; letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.2s;
     font-family: 'Rajdhani', sans-serif;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    text-decoration: none;
   }
-  .btn-rc-check:hover:not(:disabled) { background: var(--orange-dark); transform: translateY(-2px); }
+  .btn-rc-check:hover:not(:disabled) { background: linear-gradient(135deg, #0A4B45, var(--teal)); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(95,224,210,0.3); }
   .btn-rc-check:disabled { opacity: 0.7; cursor: not-allowed; }
   .rc-check-note {
     margin-top: 14px; font-size: 12.5px; color: var(--gray); font-weight: 600;
   }
-  .rc-status-msg {
-    display: none; margin-top: 18px; padding: 14px 18px; border-radius: 10px;
-    font-size: 14.5px; font-weight: 600; line-height: 1.6; text-align: left;
-  }
-  .rc-status-msg.show { display: block; }
-  .rc-status-msg.success { background: rgba(37,211,102,0.14); border: 1px solid rgba(37,211,102,0.4); color: #B7F0CE; }
-  .rc-status-msg.error { background: rgba(215,38,61,0.14); border: 1px solid rgba(215,38,61,0.4); color: #F5B4BC; }
 
   /* ── SECTIONS SHARED ── */
   section { padding: 72px 20px; }
@@ -906,6 +954,13 @@
 <!-- RC CHECK SECTION -->
 <section class="rc-check-section" id="rc-report">
   <div class="rc-check-wrap">
+    <div class="rc-scanner">
+      <div class="rc-scanner-ring"></div>
+      <div class="rc-scanner-ring"></div>
+      <div class="rc-scanner-ring"></div>
+      <div class="rc-scanner-core">🔍</div>
+    </div>
+
     <div class="rc-check-logo-row">
       <img src="truckmandi-logo.png" alt="Truck Mandi Logo"/>
       <span class="rc-check-brand">TRUCK <span>MANDI</span></span>
@@ -913,56 +968,30 @@
     <div class="rc-check-title">Free Vehicle <span>RC Check</span></div>
     <p class="rc-check-sub">Apna vehicle number daalein, poori RC details <b>WhatsApp par free</b> mein paayein</p>
 
+    <div class="rc-whatsapp-required"><span class="wa-ic">💬</span> Aapke phone mein WhatsApp hona ZAROORI hai</div>
+
     <form class="rc-check-form" id="rcCheckForm">
       <input type="text" id="vehicleNumber" placeholder="Vehicle Number (e.g. UP52AT7974)" required>
-      <input type="tel" id="whatsappNumber" placeholder="+91 WhatsApp Number" required pattern="(\+91)?[0-9]{10}" maxlength="13">
-      <button type="submit" class="btn-rc-check" id="rcCheckBtn">🔍 Check RC Details</button>
+      <button type="submit" class="btn-rc-check" id="rcCheckBtn">💬 WhatsApp Par RC Details Paayein</button>
     </form>
-    <p class="rc-check-note">⏱️ Details 30 second ke andar aapke WhatsApp par bhej di jayengi</p>
-
-    <div class="rc-status-msg" id="rcStatusMsg"></div>
+    <p class="rc-check-note">👉 Button dabate hi aapka WhatsApp khulega, vehicle number already type hoga — bas Send dabana hai</p>
   </div>
 </section>
 
 <script>
 (function () {
   var form = document.getElementById('rcCheckForm');
-  var btn = document.getElementById('rcCheckBtn');
-  var statusMsg = document.getElementById('rcStatusMsg');
-
-  // 🔧 Apna Apps Script Web App URL yahan daalein (Deploy > New deployment > Web app se milega)
-  var WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwrhrVkTtVCxfIofAsiP90Hme4nYO1ckOpBiPjATf-8yz5HAwRUCcZgiVauZJPthHDC9A/exec;
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
     var vehicleNo = document.getElementById('vehicleNumber').value.trim().toUpperCase();
-    var whatsappNo = document.getElementById('whatsappNumber').value.trim().replace(/\+/g, '');
+    if (!vehicleNo) return;
 
-    btn.disabled = true;
-    btn.innerText = "⏳ Processing...";
+    var waNumber = "917549437078"; // Truck Mandi ka WhatsApp number
+    var waUrl = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(vehicleNo);
 
-    statusMsg.className = "rc-status-msg show success";
-    statusMsg.innerHTML = "✅ Request mil gayi! Vehicle <b>" + vehicleNo + "</b> ki details 30 second ke andar aapke WhatsApp (" + whatsappNo + ") par bhej di jayengi. Kripya apna WhatsApp check karein.";
-
-    fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ vehicleNumber: vehicleNo, whatsappNumber: whatsappNo })
-    })
-    .then(function () {
-      setTimeout(function () {
-        btn.disabled = false;
-        btn.innerText = "🔍 Check RC Details";
-        form.reset();
-      }, 3000);
-    })
-    .catch(function () {
-      statusMsg.className = "rc-status-msg show error";
-      statusMsg.innerHTML = "❌ Kuch problem hui. Kripya dobara try karein ya WhatsApp par sidha message karein.";
-      btn.disabled = false;
-      btn.innerText = "🔍 Check RC Details";
-    });
+    window.open(waUrl, "_blank");
   });
 })();
 </script>
