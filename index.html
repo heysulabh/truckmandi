@@ -81,7 +81,36 @@
     position: relative;
     display: flex; flex-direction: column; justify-content: center;
     overflow: hidden;
-    background: linear-gradient(180deg, #1A1009 0%, #2B1408 38%, #5A2410 62%, #8E3A12 78%, #160F0B 100%);
+    background: linear-gradient(180deg, #B34700 0%, #FF9933 15%, #FFC773 28%, #FFF3DD 40%, #E9E2C9 48%, #1E5C34 66%, #0F3D22 82%, #160F0B 100%);
+  }
+
+  /* ── Independence Day: tricolor ribbon + Ashoka Chakra watermark (signature) ── */
+  .tricolor-strip {
+    position: absolute; top: 64px; left: 0; right: 0; height: 5px; z-index: 3;
+    background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #128807 66.6%, #128807 100%);
+  }
+  .ashoka-chakra {
+    position: absolute; top: 46%; left: 50%;
+    width: 620px; height: 620px; max-width: 90vw;
+    transform: translate(-50%, -48%);
+    opacity: 0.1; z-index: 1; pointer-events: none;
+    animation: chakraSpin 60s linear infinite;
+  }
+  @keyframes chakraSpin { to { transform: translate(-50%, -48%) rotate(360deg); } }
+
+  .id-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(90deg, rgba(255,153,51,0.22), rgba(255,255,255,0.14), rgba(18,136,7,0.22));
+    border: 1px solid rgba(255,255,255,0.55);
+    color: #FFF3DD;
+    padding: 6px 14px; border-radius: 50px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .tiranga-underline {
+    width: 130px; height: 5px; border-radius: 3px; margin: 4px 0 18px;
+    background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.3%, #FFFFFF 33.3%, #FFFFFF 66.6%, #128807 66.6%, #128807 100%);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.25);
   }
 
   .vehicle-parade {
@@ -648,12 +677,30 @@
 
   /* ── CTA ── */
   .cta-section {
-    background: linear-gradient(135deg, #2A1003, #150801);
-    border-top: 2px solid var(--orange); border-bottom: 2px solid var(--orange);
-    text-align: center; padding: 80px 20px;
+    position: relative;
+    background: linear-gradient(160deg, #7A3B00 0%, #2A1003 30%, #150801 58%, #0C2818 80%, #081F12 100%);
+    border-top: 3px solid transparent; border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, #FF9933, #FFFFFF 50%, #128807) 1;
+    text-align: center; padding: 80px 20px; overflow: hidden;
   }
-  .cta-section .section-title { margin-bottom: 14px; }
-  .cta-section p { color: #C9BFAD; font-size: 17px; max-width: 500px; margin: 0 auto 36px; }
+  .cta-section::before {
+    content: '';
+    position: absolute; top: -25%; left: 50%; width: 560px; height: 560px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(255,153,51,0.14) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-id-tag {
+    position: relative; z-index: 1;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(90deg, rgba(255,153,51,0.2), rgba(255,255,255,0.12), rgba(18,136,7,0.2));
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #FFF3DD; padding: 6px 16px; border-radius: 50px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .cta-section .section-title { position: relative; z-index: 1; margin-bottom: 14px; }
+  .cta-section p { position: relative; z-index: 1; color: #C9BFAD; font-size: 17px; max-width: 500px; margin: 0 auto 36px; }
   .cta-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
   .btn-wa-cta {
     display: inline-flex; align-items: center; gap: 10px; background: var(--green); color: #fff; text-decoration: none;
@@ -663,9 +710,9 @@
   .btn-wa-cta:hover { background: var(--green-dark); transform: translateY(-2px); }
   .btn-call-cta {
     display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--cream); text-decoration: none;
-    padding: 18px 36px; border-radius: 8px; font-size: 18px; font-weight: 700; border: 2px solid var(--cream); transition: all 0.2s;
+    padding: 18px 36px; border-radius: 8px; font-size: 18px; font-weight: 700; border: 2px solid #FF9933; transition: all 0.2s;
   }
-  .btn-call-cta:hover { background: var(--cream); color: var(--ink); transform: translateY(-2px); }
+  .btn-call-cta:hover { background: #FF9933; color: #160F0B; transform: translateY(-2px); }
 
   /* ── CONTACT ── */
   .contact-section { background: var(--ink2); text-align: center; }
@@ -721,6 +768,35 @@
 
 <!-- HERO -->
 <section class="hero">
+  <div class="tricolor-strip"></div>
+  <svg class="ashoka-chakra" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="300" cy="300" r="260" fill="none" stroke="#0B3D91" stroke-width="6"/>
+    <circle cx="300" cy="300" r="60" fill="none" stroke="#0B3D91" stroke-width="6"/>
+    <line x1="360.0" y1="300.0" x2="560.0" y2="300.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="358.0" y1="315.5" x2="551.1" y2="367.3" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="352.0" y1="330.0" x2="525.2" y2="430.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="342.4" y1="342.4" x2="483.8" y2="483.8" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="330.0" y1="352.0" x2="430.0" y2="525.2" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="315.5" y1="358.0" x2="367.3" y2="551.1" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="300.0" y1="360.0" x2="300.0" y2="560.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="284.5" y1="358.0" x2="232.7" y2="551.1" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="270.0" y1="352.0" x2="170.0" y2="525.2" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="257.6" y1="342.4" x2="116.2" y2="483.8" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="248.0" y1="330.0" x2="74.8" y2="430.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="242.0" y1="315.5" x2="48.9" y2="367.3" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="240.0" y1="300.0" x2="40.0" y2="300.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="242.0" y1="284.5" x2="48.9" y2="232.7" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="248.0" y1="270.0" x2="74.8" y2="170.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="257.6" y1="257.6" x2="116.2" y2="116.2" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="270.0" y1="248.0" x2="170.0" y2="74.8" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="284.5" y1="242.0" x2="232.7" y2="48.9" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="300.0" y1="240.0" x2="300.0" y2="40.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="315.5" y1="242.0" x2="367.3" y2="48.9" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="330.0" y1="248.0" x2="430.0" y2="74.8" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="342.4" y1="257.6" x2="483.8" y2="116.2" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="352.0" y1="270.0" x2="525.2" y2="170.0" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+    <line x1="358.0" y1="284.5" x2="551.1" y2="232.7" stroke="#0B3D91" stroke-width="6" stroke-linecap="round"/>
+  </svg>
   <div class="vehicle-parade">
 
     <div class="vehicle-chip">
@@ -809,9 +885,10 @@
   </div>
 
   <div class="hero-content">
-    <div class="hero-badge">🏆 India's Trusted Marketplace</div>
+    <div class="id-badge">🇮🇳 Azadi Ka Amrit Mahotsav — Independence Day Special</div>
     <h1>Buy &amp; Sell<br><span>Commercial</span><br>Vehicles</h1>
-    <p class="hero-sub">Trucks, Pickups &amp; Commercial Vehicles – One Platform, All Over India</p>
+    <div class="tiranga-underline"></div>
+    <p class="hero-sub">Trucks, Pickups &amp; Commercial Vehicles – One Platform, All Over India 🇮🇳</p>
     <div class="hero-checks">
       <div class="hero-check"><span class="tick">✔</span> All India Service</div>
       <div class="hero-check"><span class="tick">✔</span> Verified Buyers &amp; Sellers</div>
@@ -1390,6 +1467,7 @@
 
 <!-- CTA -->
 <section class="cta-section">
+  <div class="cta-id-tag">🇮🇳 Is Independence Day, Apni Gaadi Ko Milegi Nayi Azaadi</div>
   <div class="section-title">Start Today –<br><span>Buy or Sell Easily</span></div>
   <p>Abhi WhatsApp karo ya call karo – ek click mein shuru karo</p>
   <div class="cta-btns">
