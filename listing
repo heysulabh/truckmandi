@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<!--
+  TRUCK MANDI — LISTING WEBSITE (static frontend)
+  =================================================
+  Yeh asli website hai — GitHub Pages / truckmandi.online par
+  "listing" folder me daal do (jaise truckmandi.online/listing/index.html).
+
+  Yeh khud koi vehicle data store nahi karti — Apps Script se
+  (APPS_SCRIPT_API URL) JSONP ke through live data mangati hai,
+  taaki Google Sheet me jo bhi "Live" status wali gaadi ho wahi
+  yahan dikhe, bina site ko baar-baar rebuild kiye.
+
+  Isi folder me "logo.jpg" bhi daal dena (Truck Mandi ka logo),
+  yeh file usi ko reference karti hai.
+-->
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Truck Mandi — Buy &amp; Sell Commercial Vehicles</title>
+<style>
+  *{box-sizing:border-box;}
+  body{font-family:"Segoe UI",Arial,sans-serif;background:#f4f3f0;margin:0;padding:0;}
+
+  .header{background:#1c1c1c;color:#fff;padding:14px 16px;text-align:center;position:sticky;top:0;z-index:5;}
+  .header .logo-row{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .header .logo-row img{height:36px;width:36px;border-radius:50%;object-fit:cover;background:#fff;}
+  .header .brand-name{font-size:20px;font-weight:700;letter-spacing:0.5px;}
+  .header small{display:block;color:#f4a536;font-size:11px;margin-top:2px;letter-spacing:1px;}
+  .support-row{display:flex;justify-content:center;gap:8px;margin-top:8px;}
+  .support-row a{font-size:11px;color:#fff;background:rgba(255,255,255,0.12);padding:5px 10px;border-radius:14px;text-decoration:none;}
+
+  .filter-bar{background:#fff;padding:10px;display:flex;gap:6px;flex-wrap:wrap;box-shadow:0 1px 4px rgba(0,0,0,0.08);position:sticky;top:0;z-index:4;}
+  .filter-bar select{flex:1;min-width:80px;padding:7px;border-radius:6px;border:1px solid #ccc;font-size:12px;background:#fafafa;}
+  .filter-bar button{background:#f4a536;color:#1c1c1c;border:none;padding:7px 12px;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer;}
+
+  .grid{padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;min-height:200px;}
+  .card{background:#fff;border-radius:10px;box-shadow:0 1px 5px rgba(0,0,0,0.1);overflow:hidden;cursor:pointer;}
+  .card img.thumb{width:100%;height:110px;object-fit:cover;display:block;background:#eee;}
+  .card-body{padding:8px 10px 10px;}
+  .price{font-size:15px;font-weight:800;color:#1c1c1c;}
+  .meta{color:#666;font-size:11px;margin-top:2px;line-height:1.4;}
+  .meta b{color:#1c1c1c;}
+  .view-btn{display:block;text-align:center;background:#1c1c1c;color:#fff;padding:7px;border-radius:6px;margin-top:8px;font-weight:700;font-size:12px;}
+  .empty-msg,.loading-msg{grid-column:1/-1;text-align:center;color:#777;margin-top:50px;padding:0 20px;font-size:15px;}
+
+  .pagination{display:flex;justify-content:center;gap:10px;padding:8px 12px 28px;}
+  .pagination button{background:#1c1c1c;color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;}
+  .pagination button:disabled{opacity:0.35;cursor:default;}
+  .pagination span.page-info{align-self:center;color:#777;font-size:13px;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:20;align-items:flex-end;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal-sheet{background:#fff;width:100%;max-width:480px;border-radius:16px 16px 0 0;max-height:90vh;overflow-y:auto;}
+  .modal-close{text-align:right;padding:8px 12px 0;}
+  .modal-close span{display:inline-block;font-size:20px;color:#888;cursor:pointer;padding:4px 8px;}
+  .modal-carousel{position:relative;}
+  .modal-carousel .track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;}
+  .modal-carousel .track img{flex:0 0 100%;scroll-snap-align:start;width:100%;height:260px;object-fit:cover;background:#eee;}
+  .modal-carousel .dots{position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:5px;}
+  .modal-carousel .dots span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.6);}
+  .modal-carousel .dots span.active{background:#f4a536;}
+  .modal-body{padding:14px 18px 24px;}
+  .modal-body .price{font-size:22px;}
+  .modal-body .meta{font-size:14px;margin:6px 0;}
+  .modal-body .desc{color:#444;font-size:14px;margin-top:8px;line-height:1.5;}
+  .modal-body .call-btn{display:block;text-align:center;background:#e53935;color:#fff;text-decoration:none;padding:12px;border-radius:8px;margin-top:16px;font-weight:700;font-size:16px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo-row"><img src="logo.jpg" alt="Truck Mandi"><span class="brand-name">Truck Mandi</span></div>
+  <small>COMMERCIAL VEHICLE MARKETPLACE</small>
+  <div class="support-row">
+    <a href="tel:+917549437078">&#128222; Support Call</a>
+    <a href="https://wa.me/917549437078">&#128172; WhatsApp Support</a>
+  </div>
+</div>
+
+<form class="filter-bar" id="filterBar" style="display:none;">
+  <select name="state" id="fState"><option value="">Sabhi</option></select>
+  <select name="brand" id="fBrand"><option value="">Sabhi</option></select>
+  <select name="type" id="fType"><option value="">Sabhi</option></select>
+  <select name="category" id="fCategory"><option value="">Sabhi</option></select>
+  <button type="submit">Dekho</button>
+</form>
+
+<div class="grid" id="grid"><p class="loading-msg">Loading...</p></div>
+
+<div class="pagination" id="pagination"></div>
+
+<div class="modal-overlay" id="tmModal">
+  <div class="modal-sheet">
+    <div class="modal-close"><span onclick="tmClose()">&#10005;</span></div>
+    <div class="modal-carousel"><div class="track" id="tmTrack"></div><div class="dots" id="tmDots"></div></div>
+    <div class="modal-body" id="tmBody"></div>
+  </div>
+</div>
+
+<script>
+// ============== CONFIG ==============
+// Apps Script "ListingAPI.gs" deploy karne ke baad jo Web app URL mile,
+// wahi yahan daalna hai.
+var APPS_SCRIPT_API = 'https://script.google.com/macros/s/AKfycbzX0ZW8-bh_mU8QKhs0Pb4DDXE38LLo9tN8eF_Ty1EEIPbI7CVkiMTOHy4E-ERkNSfb3Q/exec';
+var PLACEHOLDER_IMG = 'https://via.placeholder.com/300x200?text=Truck+Mandi';
+
+// ============== STATE ==============
+var currentRows = [];
+
+function getQueryParams() {
+  var sp = new URLSearchParams(window.location.search);
+  return {
+    state: sp.get('state') || '',
+    brand: sp.get('brand') || '',
+    type: sp.get('type') || '',
+    category: sp.get('category') || '',
+    page: parseInt(sp.get('page'), 10) || 1
+  };
+}
+
+function isDirectLink(p) {
+  return !!(p.state && p.brand && p.type);
+}
+
+function loadData() {
+  var p = getQueryParams();
+  document.getElementById('grid').innerHTML = '<p class="loading-msg">Loading...</p>';
+
+  var cbName = 'tmCb' + Date.now();
+  window[cbName] = function (payload) {
+    onDataLoaded(payload, p);
+    delete window[cbName];
+    script.remove();
+  };
+
+  var qs = 'callback=' + cbName;
+  ['state', 'brand', 'type', 'category', 'page'].forEach(function (k) {
+    if (p[k]) qs += '&' + k + '=' + encodeURIComponent(p[k]);
+  });
+
+  var script = document.createElement('script');
+  script.src = APPS_SCRIPT_API + '?' + qs;
+  script.onerror = function () {
+    document.getElementById('grid').innerHTML = '<p class="empty-msg">Data load nahi ho paya. Thodi der me try karein.</p>';
+  };
+  document.body.appendChild(script);
+}
+
+function onDataLoaded(payload, p) {
+  currentRows = payload.rows || [];
+
+  // Filter bar: sirf tab dikhega jab direct link nahi hai
+  var bar = document.getElementById('filterBar');
+  if (isDirectLink(p)) {
+    bar.style.display = 'none';
+  } else {
+    bar.style.display = 'flex';
+    fillSelect('fState', payload.filterOptions.states, p.state);
+    fillSelect('fBrand', payload.filterOptions.brands, p.brand);
+    fillSelect('fType', payload.filterOptions.types, p.type);
+    fillSelect('fCategory', payload.filterOptions.categories, p.category);
+  }
+
+  renderGrid(currentRows);
+  renderPagination(payload.page, payload.totalPages);
+}
+
+function fillSelect(id, list, current) {
+  var sel = document.getElementById(id);
+  sel.innerHTML = '<option value="">Sabhi</option>';
+  (list || []).forEach(function (v) {
+    var opt = document.createElement('option');
+    opt.value = v;
+    opt.textContent = v;
+    if (v.toLowerCase() === (current || '').toLowerCase()) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderGrid(rows) {
+  var grid = document.getElementById('grid');
+  if (!rows.length) {
+    grid.innerHTML = '<p class="empty-msg">Filhaal is requirement ki koi gaadi available nahi hai. Jald hi update hoga.</p>';
+    return;
+  }
+  grid.innerHTML = rows.map(function (row, idx) {
+    var img = (row.images && row.images.length) ? row.images[0] : PLACEHOLDER_IMG;
+    return '<div class="card" onclick="tmOpen(' + idx + ')">' +
+      '<img class="thumb" src="' + img + '">' +
+      '<div class="card-body">' +
+      '<div class="price">' + (row.price ? '\u20B9 ' + row.price : 'Price on call') + '</div>' +
+      '<div class="meta"><b>' + row.brand + '</b><br>' + row.vehicleType + ' \u00B7 ' + row.state + '</div>' +
+      '<div class="view-btn">View Details</div>' +
+      '</div></div>';
+  }).join('');
+}
+
+function renderPagination(page, totalPages) {
+  var el = document.getElementById('pagination');
+  if (totalPages <= 1) { el.innerHTML = ''; return; }
+  el.innerHTML =
+    '<button ' + (page <= 1 ? 'disabled' : '') + ' onclick="goToPage(' + (page - 1) + ')">\u2190 Pichhla</button>' +
+    '<span class="page-info">Page ' + page + ' / ' + totalPages + '</span>' +
+    '<button ' + (page >= totalPages ? 'disabled' : '') + ' onclick="goToPage(' + (page + 1) + ')">Next \u2192</button>';
+}
+
+function goToPage(n) {
+  var sp = new URLSearchParams(window.location.search);
+  sp.set('page', n);
+  window.history.pushState({}, '', '?' + sp.toString());
+  window.scrollTo(0, 0);
+  loadData();
+}
+
+document.getElementById('filterBar').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var sp = new URLSearchParams();
+  ['state', 'brand', 'type', 'category'].forEach(function (name) {
+    var val = document.getElementsByName(name)[0].value;
+    if (val) sp.set(name, val);
+  });
+  sp.set('page', 1);
+  window.history.pushState({}, '', '?' + sp.toString());
+  loadData();
+});
+
+// -------- Detail modal --------
+function tmOpen(idx) {
+  var d = currentRows[idx];
+  var images = (d.images && d.images.length) ? d.images : [PLACEHOLDER_IMG];
+  var track = document.getElementById('tmTrack');
+  var dots = document.getElementById('tmDots');
+
+  track.innerHTML = images.map(function (src) { return '<img src="' + src + '">'; }).join('');
+  dots.innerHTML = images.length > 1
+    ? images.map(function (_, i) { return '<span' + (i === 0 ? ' class="active"' : '') + '></span>'; }).join('')
+    : '';
+
+  document.getElementById('tmBody').innerHTML =
+    '<div class="price">' + (d.price ? '\u20B9 ' + d.price : 'Price on call') + '</div>' +
+    '<div class="meta"><b>' + d.brand + '</b> \u00B7 ' + d.vehicleType + (d.category ? ' \u00B7 ' + d.category : '') + ' \u00B7 ' + d.state + '</div>' +
+    (d.description ? '<div class="desc">' + d.description + '</div>' : '') +
+    '<a class="call-btn" href="tel:+91' + d.phone + '">&#128222; Call the Owner</a>';
+
+  document.getElementById('tmModal').classList.add('open');
+  track.scrollLeft = 0;
+
+  var dotEls = dots.querySelectorAll('span');
+  if (dotEls.length > 1) {
+    track.onscroll = function () {
+      var i = Math.round(track.scrollLeft / track.clientWidth);
+      dotEls.forEach(function (el, j) { el.classList.toggle('active', j === i); });
+    };
+  }
+}
+
+function tmClose() {
+  document.getElementById('tmModal').classList.remove('open');
+}
+
+window.addEventListener('popstate', loadData);
+loadData();
+</script>
+</body>
+</html>
