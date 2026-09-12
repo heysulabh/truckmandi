@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truck Mandi — Gaadi Listing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#F2A900;
+    --charcoal:#1F2421;
+    --cream:#FBF8F2;
+    --diesel:#2F4538;
+    --rust:#B33A1E;
+    --steel:#6B6F72;
+    --line:#E4DFD3;
+    --card-bg:#FFFFFF;
+    --radius:2px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--cream);
+    color:var(--charcoal);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand,.price-tag,.stat-num{
+    font-family:'Barlow Condensed',sans-serif;
+  }
+  a{color:inherit;}
+
+  /* ===== Top bar ===== */
+  header.topbar{
+    background:var(--charcoal);
+    color:var(--cream);
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:4px solid var(--yellow);
+    position:sticky;
+    top:0;
+    z-index:50;
+  }
+  .brand{
+    font-weight:800;
+    font-size:26px;
+    letter-spacing:0.5px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    line-height:1;
+  }
+  .brand img{
+    height:40px;
+    width:40px;
+    object-fit:contain;
+    flex-shrink:0;
+  }
+  .brand-text{display:flex; flex-direction:column; gap:2px;}
+  .brand-text .name{display:flex; align-items:baseline; gap:6px;}
+  .brand span{color:var(--yellow);}
+  .brand small{
+    font-family:'Inter',sans-serif;
+    font-weight:500;
+    font-size:12px;
+    color:var(--steel);
+    display:block;
+  }
+  .topbar-right{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+  }
+  .topbar-meta{
+    font-size:13px;
+    color:var(--cream);
+    opacity:0.75;
+    font-weight:500;
+  }
+  .support-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--rust);
+    color:#fff;
+    text-decoration:none;
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:13px;
+    padding:7px 12px;
+    border-radius:var(--radius);
+    white-space:nowrap;
+  }
+  .support-btn:hover{filter:brightness(1.08);}
+
+  .result-line{
+    max-width:1180px;
+    margin:0 auto 4px;
+    font-size:13px;
+    color:var(--steel);
+    font-weight:500;
+  }
+
+  /* ===== Grid ===== */
+  main{max-width:1180px; margin:0 auto; padding:20px;}
+  #grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:16px;
+    margin-top:14px;
+  }
+  .card{
+    background:var(--card-bg);
+    border:1.5px solid var(--charcoal);
+    border-radius:var(--radius);
+    overflow:hidden;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .card:hover{transform:translateY(-3px);}
+  .card:focus-visible{outline:3px solid var(--yellow); outline-offset:2px;}
+  .card-img-wrap{
+    width:100%;
+    aspect-ratio:4/3;
+    background:var(--line);
+    position:relative;
+    overflow:hidden;
+  }
+  .card-img-wrap img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .card-img-wrap::after{
+    content:attr(data-count);
+    position:absolute;
+    bottom:6px; right:6px;
+    background:rgba(31,36,33,0.85);
+    color:var(--cream);
+    font-size:11px;
+    font-weight:600;
+    padding:2px 7px;
+    border-radius:var(--radius);
+  }
+  .card-body{padding:10px 12px 12px; display:flex; flex-direction:column; gap:5px; flex:1;}
+  .card-title{
+    font-size:16px;
+    font-weight:600;
+    line-height:1.25;
+    color:var(--charcoal);
+  }
+  .card-meta{
+    font-size:12.5px;
+    color:var(--steel);
+    font-weight:500;
+  }
+  .card-bottom{
+    margin-top:auto;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-top:6px;
+  }
+  .price-tag{
+    font-size:20px;
+    font-weight:700;
+    color:var(--diesel);
+  }
+  .loc-tag{
+    font-size:11.5px;
+    font-weight:600;
+    color:var(--rust);
+    border:1px solid var(--rust);
+    padding:2px 7px;
+    border-radius:var(--radius);
+  }
+
+  /* ===== States ===== */
+  .empty-state, .loading-state, .error-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--steel);
+  }
+  .empty-state h3, .error-state h3{color:var(--charcoal); font-size:22px; margin-bottom:6px;}
+  .spinner{
+    width:28px; height:28px;
+    border:3px solid var(--line);
+    border-top-color:var(--yellow);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+    margin:0 auto 14px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* ===== Pagination ===== */
+  .pagination{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    flex-wrap:wrap;
+    margin:28px 0 10px;
+  }
+  .pagination button{
+    font-family:'Inter',sans-serif;
+    min-width:36px;
+    height:36px;
+    padding:0 10px;
+    border:1.5px solid var(--charcoal);
+    background:var(--card-bg);
+    border-radius:var(--radius);
+    font-weight:600;
+    font-size:14px;
+    cursor:pointer;
+  }
+  .pagination button.active{
+    background:var(--charcoal);
+    color:var(--yellow);
+  }
+  .pagination button:disabled{
+    opacity:0.35;
+    cursor:not-allowed;
+  }
+  .pagination button:not(:disabled):hover{border-color:var(--rust);}
+
+  /* ===== Modal ===== */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(31,36,33,0.72);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    z-index:100;
+    padding:20px 12px;
+    overflow-y:auto;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--cream);
+    max-width:760px;
+    width:100%;
+    margin-top:20px;
+    border-radius:var(--radius);
+    overflow:hidden;
+    border:2px solid var(--charcoal);
+  }
+  .modal-close{
+    position:absolute;
+    top:10px; right:14px;
+    background:var(--charcoal);
+    color:var(--yellow);
+    border:none;
+    width:34px; height:34px;
+    border-radius:50%;
+    font-size:18px;
+    cursor:pointer;
+    z-index:5;
+  }
+  .modal-header{position:relative;}
+  .gallery{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/10;
+    background:var(--line);
+  }
+  .gallery img{
+    width:100%; height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .gallery-nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:rgba(31,36,33,0.7);
+    color:var(--cream);
+    border:none;
+    width:38px; height:38px;
+    border-radius:50%;
+    font-size:18px;
+    cursor:pointer;
+  }
+  .gallery-nav.prev{left:10px;}
+  .gallery-nav.next{right:10px;}
+  .gallery-dots{
+    position:absolute; bottom:10px; left:0; right:0;
+    display:flex; justify-content:center; gap:5px;
+  }
+  .gallery-dots span{
+    width:7px; height:7px; border-radius:50%;
+    background:rgba(255,255,255,0.55);
+  }
+  .gallery-dots span.active{background:var(--yellow);}
+  .modal-body{padding:18px 20px 22px;}
+  .modal-title{font-size:26px; font-weight:700; margin:0 0 6px;}
+  .modal-price{font-size:24px; font-weight:700; color:var(--diesel); margin-bottom:12px;}
+  .modal-tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}
+  .modal-tags span{
+    font-size:12.5px; font-weight:600;
+    border:1px solid var(--steel);
+    color:var(--charcoal);
+    padding:4px 10px;
+    border-radius:var(--radius);
+  }
+  .modal-desc{
+    font-size:14.5px; line-height:1.6; color:#3a3f3c;
+    border-top:1px solid var(--line);
+    padding-top:14px;
+    margin-bottom:18px;
+    white-space:pre-wrap;
+  }
+  .seller-box{
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    margin-bottom:16px;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .seller-name{font-weight:600; font-size:14.5px;}
+  .seller-label{font-size:11.5px; color:var(--steel); font-weight:500;}
+  .cta-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:7px;
+    padding:11px 18px;
+    border-radius:var(--radius);
+    font-weight:700;
+    font-size:14.5px;
+    text-decoration:none;
+    cursor:pointer;
+    border:none;
+    flex:1 1 auto;
+    justify-content:center;
+  }
+  .btn-call{background:var(--rust); color:#fff;}
+  .btn-wa{background:var(--diesel); color:#fff;}
+  .btn:hover{filter:brightness(1.08);}
+
+  @media (max-width:520px){
+    .brand{font-size:19px;}
+    .brand img{height:32px; width:32px;}
+    .brand-text small{display:none;}
+    header.topbar{padding:10px 14px;}
+    .support-btn{font-size:12px; padding:6px 9px;}
+    .topbar-meta{font-size:11px;}
+    .modal{margin-top:0;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="data:image/webp;base64,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" alt="Truck Mandi logo">
+    <div class="brand-text">
+      <div class="name">TRUCK<span>MANDI</span></div>
+      <small>Seedha seller se, seedha aapko</small>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-meta" id="totalCount"></div>
+    <a class="support-btn" href="tel:7549437078">📞 Support: 75494 37078</a>
+  </div>
+</header>
+
+<main>
+  <div class="result-line" id="resultLine"></div>
+  <div id="loadingState" class="loading-state">
+    <div class="spinner"></div>
+    Listings load ho rahi hain...
+  </div>
+  <div id="errorState" class="error-state" style="display:none;">
+    <h3>Listing load nahi hui</h3>
+    <p>Google Sheet link check karein ya thodi der baad try karein.</p>
+  </div>
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <h3>Abhi koi gaadi listed nahi hai</h3>
+    <p>Naya listing add karte hi yahan dikhne lagega.</p>
+  </div>
+  <div id="grid" style="display:none;"></div>
+  <div id="pagination" class="pagination"></div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal" style="position:relative;">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-header">
+      <div class="gallery" id="gallery">
+        <img id="galleryImg" src="" alt="">
+        <button class="gallery-nav prev" id="galPrev">‹</button>
+        <button class="gallery-nav next" id="galNext">›</button>
+        <div class="gallery-dots" id="galDots"></div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <h2 class="modal-title" id="mTitle"></h2>
+      <div class="modal-price" id="mPrice"></div>
+      <div class="modal-tags" id="mTags"></div>
+      <div class="modal-desc" id="mDesc"></div>
+      <div class="seller-box">
+        <div>
+          <div class="seller-label">Seller</div>
+          <div class="seller-name" id="mSeller"></div>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-call" id="mCall" href="#">📞 Call Owner</a>
+          <a class="btn btn-wa" id="mWa" href="#" target="_blank">💬 WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIG — ISE APKO BHARNA HAI
+   =========================================================
+   1. Apni Google Sheet kholiye jisme WhatsApp bot ka data aata hai.
+   2. File > Share > Publish to web > us TAB ko choose karein
+      jisme listings hain > format = "Comma-separated values (.csv)" > Publish.
+   3. Jo link milega, use niche SHEET_CSV_URL me paste kar dein.
+   4. Niche COLUMN_MAP me apni sheet ke column headers ke naam
+      exactly waise likhein jaise sheet me hain (left side hamara
+      internal naam hai, use mat badlein — sirf right side badlein).
+   ========================================================= */
+  // Filhaal real seller data yahan embed hai (Sell_karna_107_data_cleaned.xlsx se, 69 listings).
+  // Naya data aane par: neeche EMBEDDED_LISTINGS array ko replace kar dein, ya
+  // SHEET_CSV_URL me apni published Google Sheet ka CSV link daal dein — wo mile toh
+  // uska data embedded data se PEHLE priority lega.
+  const SHEET_CSV_URL = "";
+
+  const COLUMN_MAP = {
+    title:       "Vehicle",
+    brand:       "Brand",
+    type:        "Vehicle Type",
+    year:        "Year",
+    km:          "KM Driven",
+    price:       "Price",
+    location:    "Location",
+    sellerName:  "Seller Name",
+    phone:       "Phone",
+    images:      "Images",
+    description: "Description",
+    timestamp:   "Timestamp"
+  };
+
+  const PAGE_SIZE = 20;
+  const PLACEHOLDER_IMG = "https://placehold.co/600x450/1F2421/F2A900?text=Photo+not+available";
+
+const EMBEDDED_LISTINGS = [{"id": 0, "title": "Tata 407 Truck", "brand": "Tata 407", "type": "Truck", "bodyType": "Open Body", "year": "2015", "km": "168000", "price": 550000.0, "priceDisplay": "550000", "location": "Dhanbad", "sellerName": "Shubham Sharma", "phone": "9576900239", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789134566_3af7da5c-0563-4203-b58f-ff32efd32ef8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789134568_c3c69a97-ca3c-4044-b705-21a7b52800c3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789134570_016722df-3267-4984-b46e-82a863016cd0.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789134572_f714cd7e-fcf8-42de-bd96-4fe4b673775e.jpg"], "description": "Gadi full achhi condition mai hai. Paper sara complete hai", "regNo": "JH10AV8875", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-11 13:49:32"}, {"id": 1, "title": "Tata Rx 207 Pickup", "brand": "Tata Rx 207", "type": "Pickup", "bodyType": "White", "year": "2018", "km": "330000", "price": 435000.0, "priceDisplay": "435000", "location": "Uttar Pradesh Mirzapur", "sellerName": "Rohit Kumar", "phone": "9369467335", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789121979_54bee1d5-c70b-489f-85e2-69edf4799691.jpg"], "description": "", "regNo": "UP65HT1652", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-11 10:19:38"}, {"id": 2, "title": "Tata Pickup", "brand": "Tata", "type": "Pickup", "bodyType": "Not Specified", "year": "2025", "km": "14000", "price": 560000.0, "priceDisplay": "560000", "location": "Uttar Pradesh/ Kanpur Dehat", "sellerName": "Jay Nath Singh", "phone": "9506947251", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789114690_f36ee3c9-8e86-4ac8-9549-aa7eaba17b87.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789114691_967d7aef-ef04-40b6-8123-ae0732fbf126.jpg"], "description": "Tata Ace Gold CNG", "regNo": "UP77BN3237", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-11 08:18:08"}, {"id": 3, "title": "Tata 407 Gold Pickup", "brand": "Tata 407 Gold", "type": "Pickup", "bodyType": "Not Specified", "year": "2021", "km": "125000", "price": 650000.0, "priceDisplay": "650000", "location": "Rewa Madhya Pradesh", "sellerName": "Rajkumar Sondhiya", "phone": "9301033486", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789111927_de5919e2-8523-4fc6-9de8-316d11fb64d4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789111929_46c42528-7b9e-4c2d-9fb5-660f4778b1fa.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789111930_70cb489c-6037-4cf3-aac1-e33cd5132648.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789111932_e424a4d0-5dc9-4b53-b5e9-f4324824e828.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789111934_0f6a047d-60d6-4227-a674-42bbf3b7ed93.jpg"], "description": "", "regNo": "MP17G4125", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-11 07:32:06"}, {"id": 4, "title": "Pradhan Ev Loader Auto Rickshaw", "brand": "Pradhan Ev Loader", "type": "Auto Rickshaw", "bodyType": "Lohe Ki", "year": "2025", "km": "2500", "price": 100000.0, "priceDisplay": "100000", "location": "Kanpur", "sellerName": "Anjit Mishra", "phone": "8887577687", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106996_a8cf5cd8-cfb6-4fa7-9ee3-ea4fae62f40d.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106997_851134a0-39ee-486c-93c4-2ae12a7956e8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106999_1ecc910a-9dd2-499e-a726-97fadb2f324f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789107001_3a362a5a-6dff-43a7-b3dc-03401f67b455.jpg"], "description": "Only one year old", "regNo": "UP78LN7859", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-11 06:09:54"}, {"id": 5, "title": "Udaan Auto Rickshaw", "brand": "Udaan", "type": "Auto Rickshaw", "bodyType": "Steal Body", "year": "2024", "km": "2500", "price": 90000.0, "priceDisplay": "90000", "location": "Uttar Pradesh Sitapur", "sellerName": "Ajay", "phone": "8960719026", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106970_345332b7-05cd-4b6f-8691-ee5e288559a9.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106971_7fd136b8-bc4d-4f2d-b1b8-c4b8e6b27e3b.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106974_3ecaf5af-e0e5-4193-bbb2-5de9e27ddf93.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106975_053a9658-2c2b-4996-b593-24d96fd23bb6.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789106977_07cfb9f3-c494-4fa6-aaf7-c7e51638c7ab.jpg"], "description": "Udaan e rickshaw sell without battery", "regNo": "UP34CT0852", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-11 06:09:28"}, {"id": 6, "title": "Tata Ace Gold Pickup", "brand": "Tata Ace Gold", "type": "Pickup", "bodyType": "Loader", "year": "2019", "km": "50000", "price": 320000.0, "priceDisplay": "320000", "location": "Uttar Pradesh", "sellerName": "Manish Kumar", "phone": "9125379121", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789061412_e0806ec7-8d55-4c63-afc2-ff00bce312b7.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789061413_7f99321a-4bdf-44e9-b9a9-e9b9bcdd91ef.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789061414_fb41c492-bef2-48fd-bcd0-5768f5f9b917.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789061415_7ec46fb7-faaa-4b75-86b8-c34d0bc70804.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789061417_8f65e696-e582-4e25-806d-9619015ea0dd.jpg"], "description": "Tata Ace gold 2019 model only 50000 km running good condition", "regNo": "UP78FN6884", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-10 17:30:11"}, {"id": 7, "title": "Andaaz Auto Rickshaw", "brand": "Andaaz", "type": "Auto Rickshaw", "bodyType": "Iron", "year": "2023", "km": "5000", "price": 70000.0, "priceDisplay": "70000", "location": "Lucknow", "sellerName": "Aditya Chaurasiya", "phone": "9005155631", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789046136_Snapchat-723531253.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789046138_Snapchat-1178433068.jpg"], "description": "Urgent bechna hai jisko Lena ho contact kare", "regNo": "UP32MN2096", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-10 13:15:38"}, {"id": 8, "title": "Piaggio Auto Rickshaw", "brand": "Piaggio", "type": "Auto Rickshaw", "bodyType": "Apé Fx Max", "year": "2024", "km": "80000", "price": 189000.0, "priceDisplay": "189000", "location": "Kanpur", "sellerName": "Altamas Alam", "phone": "9214634306", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789045927_519ac282-b49c-47a0-bb5d-e9908c45bca2.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789045928_5cc8fc6a-5d1f-4133-8548-12a644f2def4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789045929_ca49548a-46dd-438c-aa9a-4a43703d1d84.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789045931_06fdcd0c-30bf-49d1-9000-02eb9089516e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789045932_9d863470-d1b0-4976-a95d-f869ec4f53ea.jpg"], "description": "", "regNo": "UP78JT6583", "tyre": "3 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-10 13:12:06"}, {"id": 9, "title": "Mahindra Jeeto Pickup Pickup", "brand": "Mahindra Jeeto Pickup", "type": "Pickup", "bodyType": "Open Body", "year": "2022", "km": "50000", "price": 190000.0, "priceDisplay": "190000", "location": "Dostpur Kalyanpur", "sellerName": "Valiullah Ansari", "phone": "7618003813", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789043708_3fd79374-f945-48be-b401-5a149f26aa8f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789043709_0b19ecf6-fbba-4a11-8b0f-3d349bb52c97.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789043711_c74bd357-c151-4cad-9ea6-75ff1d5e4091.jpg"], "description": "", "regNo": "UP42BT5557", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-10 12:35:07"}, {"id": 10, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Not Specified", "year": "2016", "km": "124188", "price": 1400000.0, "priceDisplay": "1400000", "location": "Gaya", "sellerName": "Meena Quaiser", "phone": "7004155583", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040567_0dacc18f-f590-446b-86f4-c10dd78d30b6.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040568_eec0d062-c2d2-457e-b456-2c70244b2e7b.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040569_a1bf10c5-3a31-4f4f-a743-62eabac3abc5.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040570_a486732a-3fd3-4960-9f31-183bea2b3b7e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040572_0ba3652a-b398-4c9a-8d38-0d3817d20062.jpg"], "description": "", "regNo": "CG04LE6512", "tyre": "14 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-09-10 11:42:46"}, {"id": 11, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Not Specified", "year": "2018", "km": "160210", "price": 1080000.0, "priceDisplay": "1080000", "location": "Bihar", "sellerName": "Pankaj Kumar", "phone": "9162502014", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032317_IMG_20260909_115653459_HDR.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032318_IMG_20260909_115648979_HDR.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032319_IMG_20260909_115657430_HDR.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032321_IMG_20260909_115721580_HDR.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032322_IMG_20260909_115737013_HDR.jpg"], "description": "", "regNo": "BR06GD1959", "tyre": "6 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-10 09:25:16"}, {"id": 12, "title": "Bharat Benz Truck", "brand": "Bharat Benz", "type": "Truck", "bodyType": "Not Specified", "year": "2024", "km": "1800000", "price": 4500000.0, "priceDisplay": "4500000", "location": "Madhya Pradesh", "sellerName": "Gangadhar Dwivedi", "phone": "9407189008", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788965670_c7986be7-1ba5-4dcd-8109-c88a39abcfbe.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788965671_a2e9adf7-865e-44e8-9fe2-63ff156f5165.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788965672_aeb22bd7-78c8-4a4c-9c3f-eace98661cda.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788965673_5a942707-79ac-421f-b64f-50801fa4a6b6.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788965674_c642dd55-f8ba-4efb-9075-3bc6473481d6.jpg"], "description": "", "regNo": "MP18ZD9515", "tyre": "16 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-09 14:54:29"}, {"id": 13, "title": "Ashok Leyland Truck", "brand": "Ashok Leyland", "type": "Truck", "bodyType": "Not Specified", "year": "2024", "km": "80000", "price": 3900000.0, "priceDisplay": "3900000", "location": "Madhya Pradesh", "sellerName": "Nilesh Singh Chandel", "phone": "8602905379", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788938852_058f460c-5d77-4e20-9d02-803da0d619c4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788938854_d7864e06-8c47-4c6e-b740-a9f6b0570378.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788938855_d65fc758-2d4d-41a6-9647-da5609443422.jpg"], "description": "", "regNo": "CG15EB8943", "tyre": "12 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-09 07:27:30"}, {"id": 14, "title": "Tata 2515 Tc Truck", "brand": "Tata 2515 Tc", "type": "Truck", "bodyType": "Full Body", "year": "2010", "km": "200000", "price": 550000.0, "priceDisplay": "550000", "location": "Raipur", "sellerName": "Munna Choubey", "phone": "8109111620", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788934418_0c49bbb5-01cb-468f-adad-b8135ab62b7e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788934419_6e17d17b-ef09-4c8a-87d0-7ad2c4528845.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788934420_8e70b95e-f6e3-4e39-ae4d-c2daa72e5725.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788934421_ab2b8f66-5417-4919-91bd-803e65adc568.jpg"], "description": "TATA LPT 2515 TC 10-Wheeler, 2010 – Good Condition, Ready to Work", "regNo": "CG10C4793", "tyre": "10 Chakka", "owners": "3", "permit": "State Permit", "submitted": "2026-09-09 06:13:37"}, {"id": 15, "title": "Tata Motors 407 Truck", "brand": "Tata Motors 407", "type": "Truck", "bodyType": "Full", "year": "2018", "km": "75000", "price": 1499999.0, "priceDisplay": "1499999", "location": "Mp Balaghat Katangi", "sellerName": "Ayush Sahare", "phone": "9098104637", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926356_9afdaf75-8421-42c7-8131-037b49396c79.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926358_e96ae2d8-c9a0-4b7e-a372-9dd8198bbe57.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926359_53ff9297-2ad6-42d1-b01a-4d5687207134.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926361_2ad4778d-336d-4de0-8b9f-27bd930f41dd.jpg"], "description": "Complete Dhumal setup with sound", "regNo": "MP50G1933", "tyre": "4 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-09-09 03:59:15"}, {"id": 16, "title": "Tata Motors Pickup", "brand": "Tata Motors", "type": "Pickup", "bodyType": "Second Hand", "year": "2019", "km": "157000", "price": 300000.0, "priceDisplay": "300000", "location": "Gorakhpur", "sellerName": "Rupa Verma", "phone": "8009408383", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926088_b804cc0f-b0de-4863-b643-6381caa4bf11.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926089_2c5ca7c2-712d-4705-b833-6b24baf3b438.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926090_2b4d3f42-c994-45c1-9ff1-82ad3cc08469.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926091_2b659a54-935d-487e-a080-f752cf43b1f5.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788926092_bc21a963-d38f-4396-be7c-ee2d7706d0b1.jpg"], "description": "Good conditions", "regNo": "UP53FT2066", "tyre": "4 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-09-09 03:54:47"}, {"id": 17, "title": "E Riska Auto Rickshaw", "brand": "E Riska", "type": "Auto Rickshaw", "bodyType": "Steel", "year": "2023", "km": "100", "price": 75000.0, "priceDisplay": "75000", "location": "Jabalpur", "sellerName": "Sarmad Ali", "phone": "8770903507", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893600_2b475821-7a57-410c-a2ab-bd3cc3319bdd.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893602_77a489f1-db51-41ea-aae4-4155b08706e3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893603_4dfa59e1-88c6-4a0e-8b38-f9053ab328e9.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893604_6b1b8358-9a4f-46f1-88e9-ea553b6af80d.jpg"], "description": "Gadhi ki condition ek number hai 100 km chalti hai", "regNo": "MP20RA0663", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-08 18:53:18"}, {"id": 18, "title": "Tata Lpt 1512 Truck", "brand": "Tata Lpt 1512", "type": "Truck", "bodyType": "Open Half Body", "year": "2022", "km": "230000", "price": 1200000.0, "priceDisplay": "1200000", "location": "Guna Madhya Pradesh", "sellerName": "Brajesh Sharma", "phone": "9772524633", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893527_91655070-d699-4787-b098-59c190ff95b1.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893528_b13653d5-670a-40c9-9010-07931632bcf8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893529_0397664f-1504-423c-92e9-0a3c82ae1e11.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893530_6bce953c-5671-4bc9-82f8-fc18336a62b9.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788893532_afedcf2e-cc1f-4270-a2f7-376f0f95c1f5.jpg"], "description": "Tata lpt 1512", "regNo": "MP08GA4294", "tyre": "6 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-08 18:52:06"}, {"id": 19, "title": "Eicher Truck", "brand": "Eicher", "type": "Truck", "bodyType": "Not Specified", "year": "2014", "km": "100000", "price": 600000.0, "priceDisplay": "600000", "location": "Mandideep Bhopal", "sellerName": "Sumit Sahu", "phone": "9907877834", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788885966_4e48f806-e54a-4eee-96f8-acbd82b8140e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788885968_dfeb150b-e624-4ae7-80cb-1963d87f43e4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788885969_2ce40a00-f0c2-4a44-bc8b-6f2080f9dd53.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788885971_3e142a9a-2a9b-48fa-9593-a9d4ada9cf9d.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788885972_75e9785f-9cdf-4fd5-a4ed-5fa954f2e17e.jpg"], "description": "Eicher 11.10 running condition 19 feet", "regNo": "MP04GA7710", "tyre": "6 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-08 16:46:04"}, {"id": 20, "title": "Mahindra Pickup", "brand": "Mahindra", "type": "Pickup", "bodyType": "Close Body", "year": "2020", "km": "8000", "price": 400000.0, "priceDisplay": "400000", "location": "Kanpur, Uttar Pradesh", "sellerName": "Bhartendu Prakash", "phone": "9005348558", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788884452_4983d0ca-24f1-4a71-bce6-031ce51997cc.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788884454_4b03be9a-26c2-4009-b802-6675545fae08.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788884456_bf54bc82-cd25-4565-9eb0-9880642c8012.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788884459_1654f68a-be5d-4fc6-9bad-67d8294be635.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788884462_58e460c5-b8e3-4da3-bf55-30b80292d076.jpg"], "description": "Mahindra Supro minitruck november 2020 model showroom condition me Hai", "regNo": "UP77AT0286", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-08 16:20:48"}, {"id": 21, "title": "Tata Pickup", "brand": "Tata", "type": "Pickup", "bodyType": "Full Body", "year": "2019", "km": "200000", "price": 320000.0, "priceDisplay": "320000", "location": "Saharanpur", "sellerName": "Satendra Kumar", "phone": "9896620936", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882387_8868b260-d391-40bd-ac40-3f2fe2cc8db4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882389_561434e3-dba8-487e-9700-8c1bfc6f8d41.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882390_8a10dbff-8007-4e81-9bf5-a8afa45ffd4d.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882392_0ed577a8-e973-4c29-b57d-15b3fc047156.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882393_dc453f15-7b48-4422-8440-800b8717a75c.jpg"], "description": "No accidental vahicle", "regNo": "UP11BT3671", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-08 15:46:24"}, {"id": 22, "title": "E Rickshaw Auto Rickshaw", "brand": "E Rickshaw", "type": "Auto Rickshaw", "bodyType": "Not Specified", "year": "2025", "km": "42000", "price": 105000.0, "priceDisplay": "105000", "location": "Greater Noida", "sellerName": "Yaseen Saifi", "phone": "9759403431", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882113_ebad9baf-88ab-4b7e-8d4c-e5b2f16ba2dc.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882114_4cd3fba0-8238-4842-ab84-a93018fe3bc6.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882116_13bd7feb-fe9b-489a-8a5a-041b638f834d.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882118_7aa1937d-49f9-4214-b97f-e44f999c11f3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788882120_1748e827-c1ad-4f81-903b-b19b2993b7c3.jpg"], "description": "", "regNo": "UP16QT3360", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-08 15:41:51"}, {"id": 23, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Cargo", "year": "2019", "km": "500000", "price": 1350000.0, "priceDisplay": "1350000", "location": "Hoshiarpur /Punjab", "sellerName": "Ansh", "phone": "9501061795", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788879287_8970c6f2-8373-46dd-a487-c6983cb03e1e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788879290_5306d0e5-a569-4550-a7fe-93afed81813c.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788879293_cccd202f-dd92-4df4-90f2-bd2bef5e3d28.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788879294_d3e078aa-b1d4-4ecb-890c-77f17d87ff11.jpg"], "description": "Good condition truck", "regNo": "PBO7BS8195", "tyre": "6 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-08 14:54:54"}, {"id": 24, "title": "Ashok Leyland Truck", "brand": "Ashok Leyland", "type": "Truck", "bodyType": "Open", "year": "2019", "km": "180000", "price": 1850000.0, "priceDisplay": "1850000", "location": "Chhattisgarh/Ambikapur", "sellerName": "Saddam Khan", "phone": "7694831081", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788878812_bb72a92c-4e00-43a5-858a-30deff73c36a.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788878813_49de7c4c-41cf-43b6-a550-5eb58cfababc.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788878814_7e60bf2c-0719-444e-a348-4992e62c3f4e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788878815_3629658a-dbf0-42ec-87ec-8efc4a3e052c.jpg"], "description": "LIFE TIME TAX FREE", "regNo": "MP30H2214", "tyre": "16 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-09-08 14:46:50"}, {"id": 25, "title": "Ashok Layland Pickup", "brand": "Ashok Layland", "type": "Pickup", "bodyType": "Not Specified", "year": "2020", "km": "37000", "price": 550000.0, "priceDisplay": "550000", "location": "Lucknow", "sellerName": "Zeeshan", "phone": "9695647428", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788877755_022b4470-c16d-4249-84ea-f8062e61cb20.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788877756_70ee3cb7-5740-4aea-83cf-ff7fa7377a03.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788877758_0ed219c0-eb31-4a1f-aaa3-8686049ead87.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788877760_9a183d84-9188-45da-bb70-d6e42664e46f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788877761_6db1207a-0d0e-4d0a-8ec7-58c5533e1f82.jpg"], "description": "", "regNo": "UP32NN4425", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-08 14:29:13"}, {"id": 26, "title": "Piaggio Ape Pickup", "brand": "Piaggio Ape", "type": "Pickup", "bodyType": "Not Specified", "year": "2022", "km": "1200", "price": 180000.0, "priceDisplay": "180000", "location": "Chatra Jharkhand", "sellerName": "Arnav", "phone": "7858039658", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788877467_f723679f-6e10-4901-a24d-cef09df7d872.jpg"], "description": "", "regNo": "JH02BG3950", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-08 14:24:25"}, {"id": 27, "title": "Ashoka Leyland Truck", "brand": "Ashoka Leyland", "type": "Truck", "bodyType": "Not Specified", "year": "2024", "km": "124823", "price": 1800000.0, "priceDisplay": "1800000", "location": "Ghaziabad", "sellerName": "Chhem Kumar Singh", "phone": "7701900457", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788861448_07674d98-0100-44ba-a12c-742abf464141.jpg"], "description": "", "regNo": "UP14PT3041", "tyre": "6 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-08 09:57:29"}, {"id": 28, "title": "Mahindra Auto Rickshaw", "brand": "Mahindra", "type": "Auto Rickshaw", "bodyType": "Not Specified", "year": "2025", "km": "13000", "price": 240000.0, "priceDisplay": "240000", "location": "Bihar", "sellerName": "Kumari Warsha Rani", "phone": "9430801737", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788778832_0b59f56a-5409-46a0-9cdc-080d9a2ab119.jpg"], "description": "Na", "regNo": "BR19GB0215", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-07 11:00:27"}, {"id": 29, "title": "Tata S Pickup", "brand": "Tata S", "type": "Pickup", "bodyType": "Loding Gadi", "year": "2019", "km": "250000", "price": 270000.0, "priceDisplay": "270000", "location": "Raipur", "sellerName": "Karan Sahu", "phone": "8827270613", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788766700_5bf7b282-4b2f-4a7a-8fd1-f26a7bd11898.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788766703_780a381f-ecd3-43de-a212-ee8c8bd6946f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788766705_8f9cb69f-2f0c-4bf2-9421-fa8611dc5d14.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788766706_efc4edc5-0586-4f4d-a6b5-cf7c594c18b4.jpg"], "description": "Right condition and normal price", "regNo": "CG04MW8262", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-07 07:38:27"}, {"id": 30, "title": "Tata Motors Truck", "brand": "Tata Motors", "type": "Truck", "bodyType": "Dumfer", "year": "2017", "km": "200000", "price": 1700000.0, "priceDisplay": "1700000", "location": "Shahjahanpur Uttar Pradesh", "sellerName": "Brajendra Rathore", "phone": "9455559331", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788765338_756fbbd9-5c1b-427d-8067-67c94a2d88ee.jpg"], "description": "Vehicle is Good Condition", "regNo": "UP25ET4824", "tyre": "14 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-07 07:15:39"}, {"id": 31, "title": "Bajaj Cng Auto Rickshaw", "brand": "Bajaj Cng", "type": "Auto Rickshaw", "bodyType": "Not Specified", "year": "2023", "km": "59000", "price": 185000.0, "priceDisplay": "185000", "location": "Satna/ Mp", "sellerName": "Sachin Tripathi", "phone": "9669978811", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788762205_05592a18-6ffd-4173-9bbc-a5b37cb35de6.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788762207_d9d90df4-9512-4c15-a9fa-d1ae9dec43a3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788762209_5a54a8d8-4d90-46cd-847c-48e4c2b066ff.jpg"], "description": "Gadi full complite kar ke dena hai", "regNo": "MP19ZD4136", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-07 06:23:29"}, {"id": 32, "title": "Tata Ace Pickup", "brand": "Tata Ace", "type": "Pickup", "bodyType": "Good", "year": "2021", "km": "77000", "price": 350000.0, "priceDisplay": "350000", "location": "Uttar Pradesh", "sellerName": "Altamash", "phone": "9557201623", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788760355_00a4ef58-71d5-407b-a6cb-06c5546117a2.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788760356_8ac1af43-d140-458b-811f-afbb05ea2155.jpg"], "description": "Good condition har cheez ok h bilkul", "regNo": "UP20AT7664", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-07 05:52:32"}, {"id": 33, "title": "E Riksha Auto Rickshaw", "brand": "E Riksha", "type": "Auto Rickshaw", "bodyType": "Steel", "year": "2018", "km": "18000", "price": 24500.0, "priceDisplay": "24500", "location": "Raipur", "sellerName": "Harish Tharwani", "phone": "9753317565", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788757710_b8e881ce-e16d-4c23-99a5-075a4a3179c8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788757712_1f1b70df-ce40-4b55-8b0d-e6d1ae2dfbe4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788757714_60b274d3-5e28-46bf-ae91-4894d591374f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788757717_46349aae-04cd-44a1-bdc5-8ff7975520a7.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788757718_df42100c-54b7-4f0d-80f5-abb2aed36078.jpg"], "description": "Battery Kharab hai Change karana padega", "regNo": "CG10BD3092", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-07 05:08:26"}, {"id": 34, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Not Specified", "year": "2022", "km": "95000", "price": 1400000.0, "priceDisplay": "1400000", "location": "Bihar, Begusarai", "sellerName": "Sangam Kumar", "phone": "7479698019", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756404_image_2026-09-03_11-18-59.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756409_image_2026-09-03_11-19-14.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756412_image_2026-09-03_11-20-11.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756416_image_2026-09-03_11-19-30.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756419_image_2026-09-03_11-19-51.jpg"], "description": "", "regNo": "BR09GB7562", "tyre": "6 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-07 04:46:59"}, {"id": 35, "title": "Mahindra Tractor", "brand": "Mahindra", "type": "Tractor", "bodyType": "Tractor", "year": "2006", "km": "1111", "price": 149000.0, "priceDisplay": "149000", "location": "Gopalganj", "sellerName": "Dhananjay Yadav", "phone": "9931572024", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756271_8610bc00-b9a3-4d71-bb07-2de3c0820a0c.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756273_adda0e7b-5ccc-4919-ab35-8fb73476e572.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756276_b22d4e40-eef0-49f3-8600-cb53685ad46f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756277_e3cf212b-848e-43ce-a8e9-da6d0c7b1151.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788756278_ee793693-257e-4b54-a1a3-9478be8b5125.jpg"], "description": "Gadi ki condition aachha hai, Gadi ko jaldi sell karna hai", "regNo": "BR28", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-07 04:44:30"}, {"id": 36, "title": "Pragati Auto Rickshaw", "brand": "Pragati", "type": "Auto Rickshaw", "bodyType": "Loha", "year": "2021", "km": "40000", "price": 0, "priceDisplay": "", "location": "West Bengal", "sellerName": "Sonu", "phone": "7477347436", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685401_IMG_20260827_133643.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685403_IMG_20260827_133702.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685404_IMG_20260827_133619.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685405_IMG_20260827_133634.jpg"], "description": "Good condition", "regNo": "ERIKSHAW", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-06 09:03:19"}, {"id": 37, "title": "Force Motors Traveller Bus", "brand": "Force Motors Traveller", "type": "Bus", "bodyType": "Pkn Modification", "year": "2019", "km": "200000", "price": 1250000.0, "priceDisplay": "1250000", "location": "Gaya", "sellerName": "Ritesh Kumar", "phone": "9472424637", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685307_ce580d3e-aee6-43b3-873f-9a97ff28b8a3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685308_97fd65a7-1b19-427d-a588-3ef0f7180939.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685309_3770c895-d4f6-402f-873f-86823a0da62c.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685311_e8bd2ab6-f082-49ad-948b-f7cf67a918f8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788685313_ce83041e-9900-4dee-9755-d3da9ee809bb.jpg"], "description": "WELL MAINTAINS TEMPO TRAVELLER 16 SEATER AND PKN MODIFY", "regNo": "UP65JT1050", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-06 09:01:45"}, {"id": 38, "title": "Tata 3118 Truck", "brand": "Tata 3118", "type": "Truck", "bodyType": "Open", "year": "2018", "km": "478370", "price": 1700000.0, "priceDisplay": "1700000", "location": "Bhind Madhya Pradesh", "sellerName": "Vishal Yadav", "phone": "8519003772", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788681537_3f1ffa82-71ce-4727-be0d-701091be4603.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788681538_512be06e-b221-4a21-bdbd-0286ab9c1742.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788681539_702f099a-fb5e-44bf-aa4a-0724035318d8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788681540_21134d6c-9fb6-427a-a554-67b6eef56514.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788681541_4dbfd8b0-2a9c-46b3-a230-36860e924ffe.jpg"], "description": "Good condition and new Tyre", "regNo": "RJ11GB3772", "tyre": "12 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-09-06 07:58:57"}, {"id": 39, "title": "Tata Pickup", "brand": "Tata", "type": "Pickup", "bodyType": "Full", "year": "2013", "km": "70000", "price": 150000.0, "priceDisplay": "150000", "location": "West Bengal", "sellerName": "Dipankar Sarkar", "phone": "9614101948", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788679895_c3d1efab-df48-417b-a318-0c887ee5d441.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788679896_6eee85d6-b3fe-4c63-994a-72e271032ddf.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788679898_f6e6d97a-120b-4f31-b929-226353f563e5.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788679899_67009adf-4995-4440-a8a1-882b70964a26.jpg"], "description": "Good condition.", "regNo": "WB73D0019", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-06 07:31:34"}, {"id": 40, "title": "Ashok Leyland Truck", "brand": "Ashok Leyland", "type": "Truck", "bodyType": "Dala", "year": "2023", "km": "88000", "price": 26000000.0, "priceDisplay": "26000000", "location": "Jamshedpur", "sellerName": "Vivek", "phone": "9919954899", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788679840_142f8cab-323f-4fc1-8248-12ca96b574f3.jpg"], "description": "Vehicle is very good condition.", "regNo": "JH05DL4543", "tyre": "18 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-06 07:30:39"}, {"id": 41, "title": "Mahindra Jeeto Strong Pickup", "brand": "Mahindra Jeeto Strong", "type": "Pickup", "bodyType": "Container Type", "year": "2024", "km": "130000", "price": 400000.0, "priceDisplay": "400000", "location": "Madhya Pradesh", "sellerName": "Akil Shaikh", "phone": "9981754998", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788678136_IMG_20260901_133729.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788678138_IMG_20260901_133817.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788678139_IMG_20260901_133752.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788678141_IMG_20260901_133843.jpg"], "description": "1st Owner Diesel Variant RC Available ✅ Insurance & Fitness Valid", "regNo": "MP41ZF6611", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-06 07:02:15"}, {"id": 42, "title": "Tata Yodha Pickup", "brand": "Tata Yodha", "type": "Pickup", "bodyType": "Not Specified", "year": "2025", "km": "8400", "price": 820000.0, "priceDisplay": "820000", "location": "Mandi", "sellerName": "Kushal Chauhan", "phone": "8894183575", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788676217_956ffabf-c856-47b0-9979-738524add40a.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788676218_0d0f7822-292d-4314-9858-7b80217de16b.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788676219_370636f6-8b3d-4d5e-b427-cf5cf836fdec.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788676221_cf943e9f-20c3-45ae-8d5b-fbf89a15ea6f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788676222_b7d32950-88ff-4611-ae3f-5aeecba69df5.jpg"], "description": "", "regNo": "HP869486", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-06 06:30:16"}, {"id": 43, "title": "Ashok Leyland Ecomet Truck", "brand": "Ashok Leyland Ecomet", "type": "Truck", "bodyType": "Not Specified", "year": "2012", "km": "258000", "price": 750000.0, "priceDisplay": "750000", "location": "Himachal Pradesh/Solan", "sellerName": "Rajesh", "phone": "9816195047", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788675691_920a6cf7-82a6-4be4-8255-221a240ac2ed.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788675691_58be49b8-8254-4136-90d8-88c5665299a3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788675693_0b9933d0-1689-4f8f-b817-20313b2e0632.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788675693_58473fdf-aade-41e6-89d6-03c2665e28e1.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788675694_07306336-c936-40f9-b58f-cd78b041baae.jpg"], "description": "", "regNo": "HP13A1064", "tyre": "6 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-06 06:21:30"}, {"id": 44, "title": "Sonalika Tractor", "brand": "Sonalika", "type": "Tractor", "bodyType": "Good", "year": "2015", "km": "60000", "price": 195000.0, "priceDisplay": "195000", "location": "Jabalpur", "sellerName": "Satish Sahu", "phone": "9755043351", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788674580_925f9536-b327-4e22-bfc4-ac578392d0bc.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788674581_6b3fec95-c254-451f-9563-a8c2b397dd0e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788674582_35483299-af76-4c37-b36f-d264b1928f21.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788674583_ad74b86e-84a1-4d07-9688-e390abd3e2d5.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788674584_bf090039-519b-4d9b-87b3-7d83d4a181b7.jpg"], "description": "Tractor", "regNo": "MP34A8948", "tyre": "4 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-09-06 06:02:59"}, {"id": 45, "title": "Tata Ace Gold Pickup", "brand": "Tata Ace Gold", "type": "Pickup", "bodyType": "Not Specified", "year": "2020", "km": "74000", "price": 340000.0, "priceDisplay": "340000", "location": "Odisha", "sellerName": "Kishor Mohanty", "phone": "9860697767", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788669152_817879c2-a38e-47cb-ac40-d0aa23e26cc4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788669154_a568ec01-fe34-4e24-b082-d6ed39708f92.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788669156_a4721741-7d8a-4f11-ba7f-d82b6ae6afee.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788669157_5c3a2e61-e324-421c-9a37-14901cad74de.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788669159_10efa55e-9810-4b07-97ca-f1186577bbb9.jpg"], "description": "Bs 4 engine , very good condation ,", "regNo": "OD11U5541", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-06 04:32:39"}, {"id": 46, "title": "Tata Pickup", "brand": "Tata", "type": "Pickup", "bodyType": "Container", "year": "2024", "km": "19800", "price": 360000.0, "priceDisplay": "360000", "location": "Ludhiana", "sellerName": "Shivam", "phone": "8196048733", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788614265_IMG-20260831-WA0021.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788614268_IMG-20260831-WA0013.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788614272_IMG-20260831-WA0012.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788614274_IMG-20260804-WA0015.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788614276_IMG-20260804-WA0014.jpg"], "description": "", "regNo": "PB10JZ5192", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-05 13:17:57"}, {"id": 47, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Dala Body", "year": "2012", "km": "100000", "price": 850000.0, "priceDisplay": "850000", "location": "Jharkhand/ Jamshedpur", "sellerName": "Krishna Kumar Rai", "phone": "9040501375", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606771_483cf2cf-b62c-4926-b9ce-ef5db66dc443.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606774_f493a435-1428-4664-b2ca-bbd930dc04f1.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606777_ca6d0046-935b-46ac-b1d9-d49b8cdfc998.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606781_cab16dac-9d4a-4b0b-b59f-1db325f839c0.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606785_b3988f7c-7f3a-475e-9b3f-9522e08da243.jpg"], "description": "Upto date truck in running condition", "regNo": "JH05AQ3611", "tyre": "12 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-05 11:12:48"}, {"id": 48, "title": "Bolero Maxx Pickup", "brand": "Bolero Maxx", "type": "Pickup", "bodyType": "Full Body", "year": "2022", "km": "96800", "price": 550000.0, "priceDisplay": "550000", "location": "Agra", "sellerName": "Pooja Singh", "phone": "9993015955", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788668461_050cf80d-54d5-4645-8e6e-ac75a876021e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788668462_275cd405-86e3-4c70-b771-c96d9d02a59f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788668463_1be6d915-e262-4480-ad9f-c099ea322382.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788668464_b4d265f8-4cf8-445d-a010-d8d8a49f929f.jpg"], "description": "Good condition", "regNo": "UP80FT7117", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-09-05 11:02:27"}, {"id": 49, "title": "Tata Ace Xl Pickup", "brand": "Tata Ace Xl", "type": "Pickup", "bodyType": "Not Specified", "year": "2019", "km": "62000", "price": 325000.0, "priceDisplay": "325000", "location": "Ambedkar Nagar Maharuwa", "sellerName": "Ramyag Yadav", "phone": "9372856769", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788583737_IMG_9968.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788583739_IMG_9967.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788583740_IMG_9971.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788583742_IMG_9970.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788583744_IMG_9969.JPG"], "description": "In very good condtion engine is not opened yet", "regNo": "HR45AT0896", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-05 04:48:56"}, {"id": 50, "title": "Bolero Pickup Pickup", "brand": "Bolero Pickup", "type": "Pickup", "bodyType": "Closd Body", "year": "2018", "km": "200000", "price": 370000.0, "priceDisplay": "370000", "location": "Meerut", "sellerName": "Amit Kumar", "phone": "9756560509", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788573763_cfc2bbe8-f25a-4572-835e-ce62a05c7889.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788573764_097716cb-09cd-4e5f-9d59-fb929fa2af0f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788573765_f12814ae-f955-4b4a-84da-c61672058d24.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788573767_76f62a79-deb9-47a1-ad9e-bf7c307a78c4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788573768_a64c426c-1045-4304-b86e-c62d122b5c78.jpg"], "description": "", "regNo": "UP15DT8559", "tyre": "4 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-05 02:02:42"}, {"id": 51, "title": "Ashok Leyland I4 Bada Dost Pickup", "brand": "Ashok Leyland I4 Bada Dost", "type": "Pickup", "bodyType": "Not Specified", "year": "2023", "km": "36000", "price": 800000.0, "priceDisplay": "800000", "location": "Unnao", "sellerName": "Bharat Renewables Enterprises", "phone": "9793402565", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788548870_32fbdd04-6a97-46bd-a949-0fa5493083a3.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788548871_3ee8e34b-8fdb-45e8-8bdc-1ff05e9db679.jpg"], "description": "18 EMI pending", "regNo": "UP35BT3929", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-04 19:07:49"}, {"id": 52, "title": "Tata 407 Lpt Truck", "brand": "Tata 407 Lpt", "type": "Truck", "bodyType": "Full Body", "year": "2015", "km": "85876", "price": 650000.0, "priceDisplay": "650000", "location": "Ranchi (Jharkhand)", "sellerName": "Gurvinder Singh", "phone": "8987508969", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544330_1e12946f-d516-4fb4-a166-57c70dbd76be.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544332_fb783319-1d69-4117-8d9d-1c4e231ce2b1.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544332_766cd75b-7664-45d3-b059-fa0246910be6.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544333_d5de1944-9568-445c-8c07-c0300fdd843b.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544334_7c3895a3-c45a-435c-bc98-e435cd923159.jpg"], "description": "Gadi kam challa hua hai", "regNo": "JH01BU1148", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-04 17:52:09"}, {"id": 53, "title": "Ashok Leyland Truck", "brand": "Ashok Leyland", "type": "Truck", "bodyType": "Joint Body", "year": "2018", "km": "80000", "price": 1900000.0, "priceDisplay": "1900000", "location": "Bihar/Muzaffarpur", "sellerName": "Murari Thakur", "phone": "9296317622", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544108_aa37e535-1484-4981-8c7a-c6255d7bd348.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544109_b40be7be-6289-4824-ba54-a75a109ef2b1.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544110_2db4169f-d03a-4ef5-98dd-62707e947ba0.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788544111_81726c7b-4788-4f06-b87c-a7d199f730a7.jpg"], "description": "", "regNo": "BR06GD2161", "tyre": "14 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-09-04 17:48:27"}, {"id": 54, "title": "Ashoka Leyland Pickup", "brand": "Ashoka Leyland", "type": "Pickup", "bodyType": "Dost Strong Ls", "year": "2024", "km": "20000", "price": 700000.0, "priceDisplay": "700000", "location": "Siwan Bihar", "sellerName": "Arvind Kumar", "phone": "9576595037", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788533630_IMG-20260830-WA0025.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788533631_IMG-20260830-WA0027.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788533633_IMG-20260830-WA0017.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788533635_IMG-20260830-WA0023.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788533636_IMG-20260830-WA0021.jpg"], "description": "Ashoka leyland pickup", "regNo": "BR29GB9721", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-04 14:53:56"}, {"id": 55, "title": "Tractor Tractor", "brand": "Tractor", "type": "Tractor", "bodyType": "Company", "year": "2002", "km": "11000", "price": 130000.0, "priceDisplay": "130000", "location": "U P", "sellerName": "Manoj Singh", "phone": "8738942001", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788436755_57fa001f-4344-4043-b9ea-6cf650ed27dd.jpg"], "description": "New lena h", "regNo": "UP62", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-03 11:59:14"}, {"id": 56, "title": "Mahindra Pickup Plus Pickup", "brand": "Mahindra Pickup Plus", "type": "Pickup", "bodyType": "Lodar", "year": "2019", "km": "293000", "price": 410000.0, "priceDisplay": "410000", "location": "Ganjdundwara", "sellerName": "Anees Alam", "phone": "9520020601", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788435013_e08df9e3-67ef-40e4-996a-4a86117d5dfb.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788435015_baf17ed6-b58f-4348-8a9a-ddea96091d5c.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788435016_12462950-6adf-4c75-a606-5dfb687deea0.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788435018_60832be1-14a9-454f-8de8-bf6b210ff596.jpg"], "description": "", "regNo": "UP24T8091", "tyre": "4 Chakka", "owners": "3", "permit": "State Permit", "submitted": "2026-09-03 11:30:10"}, {"id": 57, "title": "Maruti Suzuki Pickup", "brand": "Maruti Suzuki", "type": "Pickup", "bodyType": "Open Body", "year": "2025", "km": "67000", "price": 600000.0, "priceDisplay": "600000", "location": "Uttar Pradesh Moradabad", "sellerName": "Ramji Singh", "phone": "9760533902", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788432150_4b5593f0-5fdb-46fc-9d8a-185d5a911d83.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788432151_875cd669-e1ab-47d1-8500-1daf82b4067b.jpg"], "description": "Supper carry cng", "regNo": "UP21FT3831", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-03 10:42:29"}, {"id": 58, "title": "Maruti Pickup", "brand": "Maruti", "type": "Pickup", "bodyType": "Not Specified", "year": "2025", "km": "45000", "price": 450000.0, "priceDisplay": "450000", "location": "Alwar", "sellerName": "Kapil Mittal", "phone": "9950147966", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788429319_b4d28322-30b0-423f-830d-7109517532e4.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788429322_fa404055-dfbb-441a-84bc-702531691342.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788429323_b9aafae5-3362-40a9-b681-e3478047559e.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788429324_e41b8e4c-bf37-428c-aac6-c06cd2cd6894.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788429326_b3dbd7ab-485f-4100-b0d8-03bbb2aa5f1e.jpg"], "description": "Good condition", "regNo": "RJ02GC6565", "tyre": "4 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-09-03 09:55:18"}, {"id": 59, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Tipper", "year": "2023", "km": "200000", "price": 2200000.0, "priceDisplay": "2200000", "location": "Uttar Pradesh", "sellerName": "Avinash Choudhary", "phone": "9719611706", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788011849_fb09ca6b-c796-47bc-9b80-df06f0c19362.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788011850_f8a3464e-6668-423f-92af-1c39ebc7a6fe.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788011851_c3da1aac-ff6f-4cf3-bef7-97ad70946487.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788011854_02d2d4c0-16b1-4796-afdc-4ffa3c56cb07.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788011856_9fd96176-d4fa-4de7-b09b-f1c10d107fd4.jpg"], "description": "A newly installed chasis from TaTa agency with get bill,", "regNo": "HR69E6775", "tyre": "16 Chakka", "owners": "3", "permit": "State Permit", "submitted": "2026-08-29 13:57:28"}, {"id": 60, "title": "Sml Truck", "brand": "Sml", "type": "Truck", "bodyType": "Open 19Ft", "year": "2018", "km": "340000", "price": 550000.0, "priceDisplay": "550000", "location": "Uttarpradesh", "sellerName": "Ankit Chaudhary", "phone": "9711585038", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787909668_caa619f3-c75c-415d-b153-ff247629d887.jpg"], "description": "Single hand used", "regNo": "UP13AT9177", "tyre": "6 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-08-28 09:34:25"}, {"id": 61, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Body", "year": "2022", "km": "26876", "price": 2100000.0, "priceDisplay": "2100000", "location": "Patna Bihar", "sellerName": "Sulabh Kumar", "phone": "6207947316", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787861908_13d33416-31ce-4d1f-bf11-c63e7fe57c84.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787861910_ce12ea9f-96e5-4d2b-9173-ef8695e0e011.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787861911_af23382d-3aab-4601-82bf-90d61d54160c.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787861912_4d46d4f0-a62a-425f-94ad-58ef73d740cf.jpg"], "description": "Very good condition", "regNo": "RJ25AY2385", "tyre": "10 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-08-27 20:18:27"}, {"id": 62, "title": "Tata 709 Truck", "brand": "Tata 709", "type": "Truck", "bodyType": "Clocd", "year": "2026", "km": "19500", "price": 200000.0, "priceDisplay": "200000", "location": "Bhiwandi", "sellerName": "Amin Hamid Shaikh", "phone": "8446194954", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787832197_1784897506837_Kotak.png"], "description": "Loan pr hai gadi bechna hai", "regNo": "MH43CQ4129", "tyre": "22 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-08-27 12:03:19"}, {"id": 63, "title": "Tata Tipper Truck", "brand": "Tata Tipper", "type": "Truck", "bodyType": "Tipper", "year": "2018", "km": "", "price": 1600000.0, "priceDisplay": "1600000", "location": "Vizianagaram", "sellerName": "Jammu Manoj", "phone": "9390391968", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787811511_IMG_1421.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787811513_IMG_1416.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787811515_IMG_1417.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787811516_IMG_1419.JPG", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787811518_IMG_1418.JPG"], "description": "Full Condition", "regNo": "AP31TP2448", "tyre": "12 Chakka", "owners": "2", "permit": "State Permit", "submitted": "2026-08-27 06:18:30"}, {"id": 64, "title": "Tata Truck", "brand": "Tata", "type": "Truck", "bodyType": "Open", "year": "2021", "km": "80056", "price": 250000.0, "priceDisplay": "250000", "location": "Delhi", "sellerName": "Shahrukh", "phone": "9899069590", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787802682_eb48db63-9b1e-459d-8f76-d3b6ddc5e354.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787802683_ac031674-7723-4e88-ae52-fa198d8bf8ec.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787802684_fe3b5579-7aee-42b7-9303-62706d8fabed.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787802685_fa6bc2aa-b6e1-467f-a342-87b30f959a52.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787802686_c7334d4c-5389-4b4f-9c1e-43401bd8a066.jpg"], "description": "Single handed", "regNo": "DL1LAE5027", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-08-27 03:51:21"}, {"id": 65, "title": "Ashok Leyland Ltd Pickup", "brand": "Ashok Leyland Ltd", "type": "Pickup", "bodyType": "Optional", "year": "2026", "km": "", "price": 1150000.0, "priceDisplay": "1150000", "location": "Delhi", "sellerName": "Shree Durga Enterprises", "phone": "8376979448", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787751429_43142656-a125-4cdb-b79a-76f792672d0f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787751430_3495b2aa-528b-4496-b441-b6b430fe91c5.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787751432_e1068f5c-2261-495f-9e6f-0128013857fc.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787751433_c5c7e765-98ec-4a28-a089-caa5df38c7d5.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787751435_2284e27d-fc12-4dd2-8dc9-489340bda6d5.jpg"], "description": "New showroom vehicle EV ,CNG, CNG+Petrol, Diesel", "regNo": "NEWVEHICLE", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-08-26 13:37:07"}, {"id": 66, "title": "Ashoka Leyland Pickup", "brand": "Ashoka Leyland", "type": "Pickup", "bodyType": "Loading", "year": "2024", "km": "60000", "price": 480000.0, "priceDisplay": "480000", "location": "Uttar Pradesh Gonda", "sellerName": "Rajendra Kumar", "phone": "8303075461", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787737387_65e66dd7-0360-4d21-bd01-58b8d93291af.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787737389_a24daf14-69e5-4497-a81e-a61c8f1291fd.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787737391_d0320ba4-18ec-48cd-aa5c-b794d301c127.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787737392_a7dc7883-bab3-4dcd-af0a-c8db9ab89898.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787737394_8def08e0-0c57-47e6-9302-931706104050.jpg"], "description": "2.5Years old", "regNo": "UP43BT5565", "tyre": "4 Chakka", "owners": "1", "permit": "National Permit", "submitted": "2026-08-26 09:43:05"}, {"id": 67, "title": "Bajaj Auto Rickshaw", "brand": "Bajaj", "type": "Auto Rickshaw", "bodyType": "Not Specified", "year": "2024", "km": "60000", "price": 290000.0, "priceDisplay": "290000", "location": "Uttar Pradesh/ Lucknow", "sellerName": "Avinash Pandey", "phone": "9984483881", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787651866_8c565d77-2dd0-49dc-a935-9af6cd4ff99a.jpg"], "description": "Best and new conditions", "regNo": "UP32UN0899", "tyre": "3 Chakka", "owners": "1", "permit": "State Permit", "submitted": "2026-08-25 09:57:45"}, {"id": 68, "title": "Tata Ultra 1918 Truck", "brand": "Tata Ultra 1918", "type": "Truck", "bodyType": "Open Body", "year": "2021", "km": "575000", "price": 100000.0, "priceDisplay": "100000", "location": "Uttar Pradesh/ Barabanki", "sellerName": "Neeraj Kumar", "phone": "8840323410", "images": ["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787649371_67de9bbf-fcb3-4ca2-845b-914c005c73a8.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787649374_473d9b50-5105-4f8f-b15c-20b09315bb69.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787649376_75aab34a-5442-48ea-98a6-b43bf77c377f.jpg", "https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1787649378_bd8f1c51-814c-424d-8b48-1a1dfe05792d.jpg"], "description": "During Lena hai", "regNo": "UP41AT9880", "tyre": "6 Chakka", "owners": "2", "permit": "National Permit", "submitted": "2026-08-25 09:16:08"}];
+
+/* ========================================================= */
+
+let allListings = [];
+let filteredListings = [];
+let currentPage = 1;
+let modalImages = [];
+let modalIndex = 0;
+
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++){
+    const c = text[i], next = text[i+1];
+    if (inQuotes){
+      if (c === '"' && next === '"'){ field += '"'; i++; }
+      else if (c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ','){ row.push(field); field = ""; }
+      else if (c === '\r'){ /* skip */ }
+      else if (c === '\n'){ row.push(field); rows.push(row); row = []; field = ""; }
+      else field += c;
+    }
+  }
+  if (field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(f => f.trim() !== ""));
+}
+
+function driveToDirectImage(url){
+  if (!url) return url;
+  url = url.trim();
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/) || url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m && m[1] && url.includes("drive.google.com")){
+    return "https://lh3.googleusercontent.com/d/" + m[1];
+  }
+  return url;
+}
+
+function toNumber(v){
+  if (!v) return 0;
+  const n = parseFloat(String(v).replace(/[^0-9.]/g,""));
+  return isNaN(n) ? 0 : n;
+}
+
+async function loadListings(){
+  try{
+    if (SHEET_CSV_URL && SHEET_CSV_URL.trim() && !SHEET_CSV_URL.includes("PASTE_YOUR")){
+      const res = await fetch(SHEET_CSV_URL, {cache:"no-store"});
+      if (!res.ok) throw new Error("fetch failed");
+      const text = await res.text();
+      const rows = parseCSV(text);
+      if (rows.length < 2) throw new Error("empty sheet");
+      const headers = rows[0].map(h => h.trim());
+      const idx = {};
+      Object.keys(COLUMN_MAP).forEach(key => {
+        idx[key] = headers.indexOf(COLUMN_MAP[key]);
+      });
+
+      allListings = rows.slice(1).map((r, i) => {
+        const get = key => idx[key] > -1 ? (r[idx[key]] || "").trim() : "";
+        const imagesRaw = get("images");
+        const images = imagesRaw
+          ? imagesRaw.split(",").map(s => driveToDirectImage(s.trim())).filter(Boolean)
+          : [];
+        return {
+          id: i,
+          title: get("title") || "Vehicle Listing",
+          brand: get("brand"),
+          type: get("type") || "Other",
+          year: get("year"),
+          km: get("km"),
+          price: toNumber(get("price")),
+          priceDisplay: get("price"),
+          location: get("location") || "N/A",
+          sellerName: get("sellerName") || "Truck Mandi Seller",
+          phone: get("phone").replace(/[^0-9+]/g,""),
+          images: images.length ? images : ["https://placehold.co/600x450/1F2421/F2A900?text=Truck+Mandi"],
+          description: get("description"),
+          timestamp: get("timestamp")
+        };
+      }).filter(l => l.title);
+    } else {
+      // Embedded real seller data (no Google Sheet configured yet)
+      allListings = EMBEDDED_LISTINGS.map(l => ({
+        ...l,
+        images: l.images && l.images.length ? l.images : ["https://placehold.co/600x450/1F2421/F2A900?text=Truck+Mandi"]
+      }));
+    }
+
+    filteredListings = [...allListings].sort((a,b) => b.id - a.id);
+    currentPage = 1;
+    renderGrid();
+  } catch(err){
+    console.error(err);
+    document.getElementById("loadingState").style.display = "none";
+    document.getElementById("errorState").style.display = "block";
+  }
+}
+
+function renderGrid(){
+  const loadingEl = document.getElementById("loadingState");
+  const errorEl = document.getElementById("errorState");
+  const emptyEl = document.getElementById("emptyState");
+  const gridEl = document.getElementById("grid");
+  loadingEl.style.display = "none";
+  errorEl.style.display = "none";
+
+  document.getElementById("totalCount").textContent = allListings.length + " listings live";
+
+  if (filteredListings.length === 0){
+    emptyEl.style.display = "block";
+    gridEl.style.display = "none";
+    document.getElementById("resultLine").textContent = "";
+    document.getElementById("pagination").innerHTML = "";
+    return;
+  }
+  emptyEl.style.display = "none";
+  gridEl.style.display = "grid";
+
+  const totalPages = Math.max(1, Math.ceil(filteredListings.length / PAGE_SIZE));
+  currentPage = Math.min(currentPage, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageItems = filteredListings.slice(start, start + PAGE_SIZE);
+
+  document.getElementById("resultLine").textContent =
+    `${filteredListings.length} gaadi mili — page ${currentPage} of ${totalPages}`;
+
+  gridEl.innerHTML = pageItems.map(l => `
+    <div class="card" tabindex="0" data-id="${l.id}">
+      <div class="card-img-wrap" data-count="${l.images.length} photo${l.images.length>1?'s':''}">
+        <img src="${escapeHtml(l.images[0])}" alt="${escapeHtml(l.title)}" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}';">
+      </div>
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(l.title)}</div>
+        <div class="card-meta">${[l.year, l.km ? l.km+' km' : ''].filter(Boolean).join(' • ')}</div>
+        <div class="card-bottom">
+          <div class="price-tag">₹${l.priceDisplay ? escapeHtml(l.priceDisplay) : 'Call for price'}</div>
+          <div class="loc-tag">${escapeHtml(l.location)}</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  gridEl.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => openModal(Number(card.dataset.id)));
+    card.addEventListener("keypress", e => { if (e.key === "Enter") openModal(Number(card.dataset.id)); });
+  });
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages){
+  const el = document.getElementById("pagination");
+  if (totalPages <= 1){ el.innerHTML = ""; return; }
+  let html = `<button ${currentPage===1?'disabled':''} data-page="${currentPage-1}">‹ Prev</button>`;
+  const windowSize = 2;
+  for (let p = 1; p <= totalPages; p++){
+    if (p === 1 || p === totalPages || Math.abs(p - currentPage) <= windowSize){
+      html += `<button class="${p===currentPage?'active':''}" data-page="${p}">${p}</button>`;
+    } else if (Math.abs(p - currentPage) === windowSize + 1){
+      html += `<span style="padding:0 4px;color:var(--steel);">…</span>`;
+    }
+  }
+  html += `<button ${currentPage===totalPages?'disabled':''} data-page="${currentPage+1}">Next ›</button>`;
+  el.innerHTML = html;
+  el.querySelectorAll("button[data-page]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      currentPage = Number(btn.dataset.page);
+      renderGrid();
+      window.scrollTo({top: 0, behavior:"smooth"});
+    });
+  });
+}
+
+function openModal(id){
+  if (window.location.hash === "#v" + id){
+    renderModal(id);
+  } else {
+    window.location.hash = "v" + id;
+  }
+}
+
+function renderModal(id){
+  const l = allListings.find(x => x.id === id);
+  if (!l) return;
+  modalImages = l.images;
+  modalIndex = 0;
+  document.getElementById("mTitle").textContent = l.title;
+  document.getElementById("mPrice").textContent = l.priceDisplay ? "₹" + l.priceDisplay : "Call for price";
+  document.getElementById("mTags").innerHTML = [l.brand, l.type, l.year, l.km ? l.km+" km" : "", l.tyre, l.owners ? l.owners+" Owner" : "", l.permit]
+    .filter(Boolean).map(t => `<span>${escapeHtml(t)}</span>`).join("");
+  document.getElementById("mDesc").textContent = l.description || "";
+  document.getElementById("mSeller").textContent = l.sellerName + (l.location ? " — " + l.location : "");
+  const phone = l.phone || "";
+  document.getElementById("mCall").href = phone ? `tel:${phone}` : "#";
+  document.getElementById("mWa").href = phone ? `https://wa.me/${phone.replace(/^\+?/,"91")}` : "#";
+  renderGallery();
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function renderGallery(){
+  const img = document.getElementById("galleryImg");
+  img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER_IMG; };
+  img.src = modalImages[modalIndex];
+  const dotsEl = document.getElementById("galDots");
+  dotsEl.innerHTML = modalImages.map((_, i) => `<span class="${i===modalIndex?'active':''}"></span>`).join("");
+  const showNav = modalImages.length > 1;
+  document.getElementById("galPrev").style.display = showNav ? "block" : "none";
+  document.getElementById("galNext").style.display = showNav ? "block" : "none";
+}
+
+function closeModal(){
+  // Back button jaisa hi behave kare: agar hash set hai to history se hataein,
+  // taaki phone/browser ka "back" button aur yahan ka X button ek jaisa kaam karein.
+  if (window.location.hash){
+    history.back();
+  } else {
+    hideModal();
+  }
+}
+
+function hideModal(){
+  document.getElementById("overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("overlay").addEventListener("click", e => { if (e.target.id === "overlay") closeModal(); });
+document.getElementById("galPrev").addEventListener("click", () => { modalIndex = (modalIndex - 1 + modalImages.length) % modalImages.length; renderGallery(); });
+document.getElementById("galNext").addEventListener("click", () => { modalIndex = (modalIndex + 1) % modalImages.length; renderGallery(); });
+
+// Phone/browser ka BACK button dabane par: agar detail popup khula hai to sirf
+// wahi band ho (URL ka #v<id> hash hatte hi), poori website se bahar na nikle.
+window.addEventListener("hashchange", () => {
+  const m = window.location.hash.match(/^#v(\d+)$/);
+  if (m){
+    renderModal(Number(m[1]));
+  } else {
+    hideModal();
+  }
+});
+
+// Agar koi seedha kisi listing ke link (#v3 jaisa) se aaya ho, use load hote hi khol dein.
+function checkInitialHash(){
+  const m = window.location.hash.match(/^#v(\d+)$/);
+  if (m) renderModal(Number(m[1]));
+}
+
+loadListings().then(checkInitialHash);
+</script>
+</body>
+</html>
