@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truck Mandi — Free Sample Listings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#F2A900; --charcoal:#1F2421; --cream:#FBF8F2; --diesel:#2F4538;
+    --rust:#B33A1E; --steel:#6B6F72; --line:#E4DFD3; --card-bg:#FFFFFF; --radius:2px;
+  }
+  *{box-sizing:border-box;} html,body{margin:0;padding:0;}
+  body{background:var(--cream); color:var(--charcoal); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.brand,.price-tag{font-family:'Barlow Condensed',sans-serif;}
+  a{color:inherit;}
+
+  header.topbar{background:var(--charcoal); color:var(--cream); padding:14px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:4px solid var(--yellow); position:sticky; top:0; z-index:50;}
+  .brand{font-weight:800; font-size:24px; letter-spacing:0.5px;}
+  .brand span{color:var(--yellow);}
+  .support-btn{display:inline-flex; align-items:center; gap:6px; background:var(--rust); color:#fff; text-decoration:none; font-weight:700; font-size:13px; padding:7px 12px; border-radius:var(--radius); white-space:nowrap;}
+
+  .sample-banner{max-width:1000px; margin:20px auto 4px; background:linear-gradient(180deg,#FFF8E8,#FFF3D6); border:2px solid var(--yellow); border-radius:8px; padding:16px 20px; text-align:center;}
+  .sample-banner h1{font-size:24px; margin-bottom:4px;}
+  .sample-banner p{font-size:13.5px; color:var(--steel); font-weight:500;}
+
+  main{max-width:1000px; margin:0 auto; padding:20px;}
+  #grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:16px; margin-top:14px;}
+  .card{background:var(--card-bg); border:1.5px solid var(--charcoal); border-radius:var(--radius); overflow:hidden; cursor:pointer; display:flex; flex-direction:column; transition:transform .12s ease;}
+  .card:hover{transform:translateY(-3px);}
+  .card-img-wrap{width:100%; aspect-ratio:4/3; background:var(--line); position:relative; overflow:hidden;}
+  .card-img-wrap img{width:100%; height:100%; object-fit:cover; display:block;}
+  .card-img-wrap::after{content:attr(data-count); position:absolute; bottom:6px; right:6px; background:rgba(31,36,33,0.85); color:var(--cream); font-size:11px; font-weight:600; padding:2px 7px; border-radius:var(--radius);}
+  .wheel-badge{position:absolute; top:6px; left:6px; background:var(--diesel); color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:3px;}
+  .card-body{padding:10px 12px 12px; display:flex; flex-direction:column; gap:5px; flex:1;}
+  .card-title{font-size:16px; font-weight:600; color:var(--charcoal);}
+  .card-meta{font-size:12.5px; color:var(--steel); font-weight:500;}
+  .card-bottom{margin-top:auto; display:flex; align-items:center; justify-content:space-between; padding-top:6px;}
+  .price-tag{font-size:20px; font-weight:700; color:var(--diesel);}
+  .loc-tag{font-size:11.5px; font-weight:600; color:var(--rust); border:1px solid var(--rust); padding:2px 7px; border-radius:var(--radius);}
+
+  .bottom-cta{max-width:1000px; margin:30px auto; background:var(--charcoal); border-radius:8px; padding:26px 22px; text-align:center;}
+  .bottom-cta h3{color:var(--cream); font-size:22px; margin-bottom:8px;}
+  .bottom-cta p{color:#B8C0BB; font-size:13.5px; margin-bottom:18px;}
+  .cta-row{display:flex; gap:12px; justify-content:center; flex-wrap:wrap;}
+  .btn{display:inline-flex; align-items:center; gap:7px; padding:12px 20px; border-radius:var(--radius); font-weight:700; font-size:14.5px; text-decoration:none;}
+  .btn-full{background:var(--yellow); color:var(--charcoal);}
+  .btn-wa{background:#25D366; color:#fff;}
+
+  .overlay{position:fixed; inset:0; background:rgba(31,36,33,0.72); display:none; align-items:flex-start; justify-content:center; z-index:100; padding:20px 12px; overflow-y:auto;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--cream); max-width:760px; width:100%; margin-top:20px; border-radius:var(--radius); overflow:hidden; border:2px solid var(--charcoal); position:relative;}
+  .modal-close{position:absolute; top:10px; right:14px; background:var(--charcoal); color:var(--yellow); border:none; width:34px; height:34px; border-radius:50%; font-size:18px; cursor:pointer; z-index:5;}
+  .gallery{position:relative; width:100%; aspect-ratio:16/10; background:var(--line);}
+  .gallery img{width:100%; height:100%; object-fit:cover; display:block;}
+  .gallery-nav{position:absolute; top:50%; transform:translateY(-50%); background:rgba(31,36,33,0.7); color:var(--cream); border:none; width:38px; height:38px; border-radius:50%; font-size:18px; cursor:pointer;}
+  .gallery-nav.prev{left:10px;} .gallery-nav.next{right:10px;}
+  .gallery-dots{position:absolute; bottom:10px; left:0; right:0; display:flex; justify-content:center; gap:5px;}
+  .gallery-dots span{width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.55);}
+  .gallery-dots span.active{background:var(--yellow);}
+  .modal-body{padding:18px 20px 22px;}
+  .modal-title{font-size:26px; font-weight:700; margin:0 0 6px;}
+  .modal-price{font-size:24px; font-weight:700; color:var(--diesel); margin-bottom:12px;}
+  .modal-tags{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;}
+  .modal-tags span{font-size:12.5px; font-weight:600; border:1px solid var(--steel); color:var(--charcoal); padding:4px 10px; border-radius:var(--radius);}
+  .modal-desc{font-size:14.5px; line-height:1.6; color:#3a3f3c; border-top:1px solid var(--line); padding-top:14px; margin-bottom:18px; white-space:pre-wrap;}
+  .seller-box{display:flex; align-items:center; justify-content:space-between; background:#fff; border:1.5px solid var(--line); border-radius:var(--radius); padding:12px 14px; gap:10px; flex-wrap:wrap;}
+  .seller-name{font-weight:600; font-size:14.5px;}
+  .seller-label{font-size:11.5px; color:var(--steel); font-weight:500;}
+  .btn-call{background:var(--rust); color:#fff;} 
+
+  @media (max-width:520px){ .brand{font-size:19px;} header.topbar{padding:10px 14px;} .modal{margin-top:0;} }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">TRUCK <span>MANDI</span></div>
+  <a class="support-btn" href="tel:7549437078">📞 75494 37078</a>
+</header>
+
+<div class="sample-banner">
+  <h1>🎁 Free Sample — 5 Vehicles</h1>
+  <p>Aise dikhti hain hamari verified listings — photos, price, seller details ke saath. Poori list dekhne ke liye neeche button dabayein.</p>
+</div>
+
+<main>
+  <div id="grid"></div>
+</main>
+
+<div class="bottom-cta">
+  <h3>Apni Gaadi Bhi List Karayein</h3>
+  <p>Aap bhi apni gaadi Truck Mandi par verified buyers ke saamne list karayein — 0% commission, direct owner deals.</p>
+  <div class="cta-row">
+    <a class="btn btn-full" href="https://truckmandi.online/listing/" target="_blank">📋 Poori Listing Dekhein</a>
+    <a class="btn btn-wa" href="https://wa.me/917549437078?text=Mujhe%20apni%20commercial%20vehicle%20bechni%20hai." target="_blank">💬 Apni Gaadi Bechni Hai</a>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="gallery" id="gallery">
+      <img id="galleryImg" src="" alt="">
+      <button class="gallery-nav prev" id="galPrev">‹</button>
+      <button class="gallery-nav next" id="galNext">›</button>
+      <div class="gallery-dots" id="galDots"></div>
+    </div>
+    <div class="modal-body">
+      <h2 class="modal-title" id="mTitle"></h2>
+      <div class="modal-price" id="mPrice"></div>
+      <div class="modal-tags" id="mTags"></div>
+      <div class="modal-desc" id="mDesc"></div>
+      <div class="seller-box">
+        <div><div class="seller-label">Seller</div><div class="seller-name" id="mSeller"></div></div>
+        <div class="cta-row">
+          <a class="btn btn-call" id="mCall" href="#">📞 Call Owner</a>
+          <a class="btn btn-wa" id="mWa" href="#" target="_blank">💬 WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PLACEHOLDER_IMG = "https://placehold.co/600x450/1F2421/F2A900?text=Photo+not+available";
+
+// 5 hand-picked mixed listings: 3-wheeler, 4-wheeler pickup, 6-wheeler, 12-wheeler, 14-wheeler
+const SAMPLE_LISTINGS = [
+  {id:12,title:"Vijay Auto Rickshaw",tyre:"3 Chakka",year:"2023",km:"4000",priceDisplay:"700000",location:"Uttar Pradesh Lucknow",sellerName:"Prakhar Bajpai",phone:"9335298386",owners:"1",permit:"State Permit",description:"Excellent condition all battery are new no damage",images:["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789319019_3945bb5a-4981-49a5-b048-f5175d3a5959.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789319020_52bd4708-7308-4b74-ad99-1da007cbdd69.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789319021_31465e82-a7a0-4f28-b3ee-0fa5afe3cded.jpg"]},
+  {id:0,title:"Tata Pickup",tyre:"4 Chakka",year:"2022",km:"75000",priceDisplay:"260000",location:"Madhya pradesh, Shahdol",sellerName:"Anwar khan",phone:"8319763012",owners:"2",permit:"National Permit",description:"Tata ace petrol, chota hathi well maintained",images:["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789751928_e6a7de7a-4c85-470d-87b9-a7fc8c3df7c7.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789751930_ac68c63d-5104-4c44-be4d-8e2caa612655.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789751932_715f708f-96e6-47f9-aaeb-5b4d68c1d2c5.jpg"]},
+  {id:31,title:"Tata Truck",tyre:"6 Chakka",year:"2018",km:"160210",priceDisplay:"1080000",location:"Bihar",sellerName:"Pankaj Kumar",phone:"9162502014",owners:"1",permit:"State Permit",description:"",images:["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032317_IMG_20260909_115653459_HDR.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032318_IMG_20260909_115648979_HDR.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789032319_IMG_20260909_115657430_HDR.jpg"]},
+  {id:67,title:"Tata Truck",tyre:"12 Chakka",year:"2012",km:"100000",priceDisplay:"850000",location:"Jharkhand/ Jamshedpur",sellerName:"Krishna kumar rai",phone:"9040501375",owners:"2",permit:"State Permit",description:"Upto date truck in running condition",images:["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606771_483cf2cf-b62c-4926-b9ce-ef5db66dc443.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606774_f493a435-1428-4664-b2ca-bbd930dc04f1.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1788606777_ca6d0046-935b-46ac-b1d9-d49b8cdfc998.jpg"]},
+  {id:30,title:"Tata Truck",tyre:"14 Chakka",year:"2016",km:"124188",priceDisplay:"1400000",location:"Gaya",sellerName:"Meena quaiser",phone:"7004155583",owners:"2",permit:"National Permit",description:"",images:["https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040567_0dacc18f-f590-446b-86f4-c10dd78d30b6.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040568_eec0d062-c2d2-457e-b456-2c70244b2e7b.jpg","https://eu2.contabostorage.com/3668f609df0e425fb64eff318f7419f4:connverz/uploads/media/whatsapp_flows/176/1789040569_a1bf10c5-3a31-4f4f-a743-62eabac3abc5.jpg"]}
+];
+
+let modalImages = [], modalIndex = 0;
+
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+
+function renderGrid(){
+  document.getElementById("grid").innerHTML = SAMPLE_LISTINGS.map(l => `
+    <div class="card" data-id="${l.id}">
+      <div class="card-img-wrap" data-count="${l.images.length} photos">
+        <span class="wheel-badge">${escapeHtml(l.tyre)}</span>
+        <img src="${escapeHtml(l.images[0])}" alt="${escapeHtml(l.title)}" loading="lazy" onerror="this.onerror=null;this.src='${PLACEHOLDER_IMG}';">
+      </div>
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(l.title)}</div>
+        <div class="card-meta">${[l.year, l.km ? l.km+' km' : ''].filter(Boolean).join(' • ')}</div>
+        <div class="card-bottom">
+          <div class="price-tag">₹${escapeHtml(l.priceDisplay)}</div>
+          <div class="loc-tag">${escapeHtml(l.location)}</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+  document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => openModal(Number(card.dataset.id)));
+  });
+}
+
+function openModal(id){
+  const l = SAMPLE_LISTINGS.find(x => x.id === id);
+  if (!l) return;
+  modalImages = l.images; modalIndex = 0;
+  document.getElementById("mTitle").textContent = l.title;
+  document.getElementById("mPrice").textContent = "₹" + l.priceDisplay;
+  document.getElementById("mTags").innerHTML = [l.tyre, l.year, l.km ? l.km+" km" : "", l.owners ? l.owners+" Owner" : "", l.permit].filter(Boolean).map(t => `<span>${escapeHtml(t)}</span>`).join("");
+  document.getElementById("mDesc").textContent = l.description || "";
+  document.getElementById("mSeller").textContent = l.sellerName + " — " + l.location;
+  document.getElementById("mCall").href = "tel:" + l.phone;
+  document.getElementById("mWa").href = "https://wa.me/91" + l.phone;
+  renderGallery();
+  document.getElementById("overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function renderGallery(){
+  const img = document.getElementById("galleryImg");
+  img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER_IMG; };
+  img.src = modalImages[modalIndex];
+  document.getElementById("galDots").innerHTML = modalImages.map((_,i)=>`<span class="${i===modalIndex?'active':''}"></span>`).join("");
+  const showNav = modalImages.length > 1;
+  document.getElementById("galPrev").style.display = showNav ? "block":"none";
+  document.getElementById("galNext").style.display = showNav ? "block":"none";
+}
+function closeModal(){ document.getElementById("overlay").classList.remove("open"); document.body.style.overflow=""; }
+document.getElementById("modalClose").addEventListener("click", closeModal);
+document.getElementById("overlay").addEventListener("click", e => { if (e.target.id==="overlay") closeModal(); });
+document.getElementById("galPrev").addEventListener("click", ()=>{ modalIndex=(modalIndex-1+modalImages.length)%modalImages.length; renderGallery(); });
+document.getElementById("galNext").addEventListener("click", ()=>{ modalIndex=(modalIndex+1)%modalImages.length; renderGallery(); });
+
+renderGrid();
+</script>
+</body>
+</html>
