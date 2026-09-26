@@ -391,24 +391,24 @@
   </div>
 </section>
 
-<!-- BROWSE LISTINGS -->
+<!-- FREE SAMPLE — separate standalone link, kept apart from the full listing site -->
 <section class="listings-section">
   <div class="listings-card">
-    <div class="li-icon">📋</div>
-    <h3>Live Vehicle Listings Dekhein</h3>
-    <p>Sabhi verified sellers ki gaadiyan ek jagah — photos, price, location ke saath. Ye link seedha kisi bhi buyer/seller ko bhi bhej sakte hain.</p>
+    <div class="li-icon">🎁</div>
+    <h3>Free Sample — Seller Listings</h3>
+    <p>5 mix vehicles ka sample dekhein — photos, price, seller details ke saath, exactly jaisa hamari full listing dikhti hai. Ye link naye customers ko direct bhej sakte hain.</p>
     <div class="listings-btns">
-      <a href="https://truckmandi.online/listing/" class="btn-listings" target="_blank">🔍 Browse All Listings</a>
+      <a href="https://truckmandi.online/sample/" class="btn-listings" target="_blank">🔍 Browse Sample Listings</a>
       <button class="btn-copylink" id="copyListingLink">🔗 Copy Link</button>
     </div>
-    <div class="listings-link-note">Direct link: <code id="listingUrlText">truckmandi.online/listing/</code></div>
+    <div class="listings-link-note">Direct link: <code id="listingUrlText">truckmandi.online/sample/</code></div>
   </div>
 </section>
 <script>
 (function(){
   var btn = document.getElementById('copyListingLink');
   btn.addEventListener('click', function(){
-    var url = "https://truckmandi.online/listing/";
+    var url = "https://truckmandi.online/sample/";
     navigator.clipboard.writeText(url).then(function(){
       var original = btn.textContent;
       btn.textContent = "✅ Copied!";
